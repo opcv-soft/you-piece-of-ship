@@ -23,9 +23,9 @@ Every script starts with a `##` line saying what it does; `grep -m1 "^##" path` 
   - Stations: `station` (base), `helm_station`, `lookout_station` (crow's nest, replaces the map table), `telescope_station` (fog), `map_chart` (the lookout's chart HUD).
   - Things to carry or hit: `item`, `item_dispenser`, `overboard_rail`, `rock` (+ `breakable`: health, loot burst), `loot`, `cannon`, `cannon_projectile` (+ `hit_fx`), `enemy_ship`, `fishing_spot`.
   - Deck chaos: `coal_smears` (spills, sooty footprints), `cargo_chaos` (chests snap loose, burst, gold overboard).
-  - Look and feel: `game_feel` (juice), `adaptive_music`, `thought_bubble`, `crew_model`, `crew_sprite`.
+  - Look and feel: `game_feel` (juice), `engine_sound`, `adaptive_music`, `thought_bubble`, `crew_model`, `crew_sprite`.
 - `scripts/contracts/` — `contract.gd` (one voyage's data), `contract_library.gd` (all hand-made contracts).
-- `scripts/systems/` — autoloads and rules: `session` (state between voyages), `progress`, `stars`, `star_rules`, `upgrades`, `voyage_log`, `hazard_director`, `net` + `net_sync` (online), `toon` (palette), `pixel_art`.
+- `scripts/systems/` — autoloads and rules: `sfx` (play a sound effect), `session` (state between voyages), `progress`, `stars`, `star_rules`, `upgrades`, `voyage_log`, `hazard_director`, `net` + `net_sync` (online), `toon` (palette), `pixel_art`.
 - `scripts/ui/` — `interaction_prompts` (per-player contextual prompts + legibility), `main_menu`, `world_map`, `dock`, `crew_join`, `pause_menu` (+ Developer panel), `results_screen`, `ui` (theme autoload), `alarm_flash`, `logo_sign`, `menu_item`.
 - `scenes/` — `levels/` (voyage, dock, rocking_deck), `greybox/` (ship, crew_player, item, rock), `ui/` (main_menu, world_map).
 - `features/<topic>.feature` ↔ `tests/integration/test_<topic>.gd` (same topic name); small pure-logic tests in `tests/unit/`; online checks in `tests/net/`.

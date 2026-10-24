@@ -110,6 +110,7 @@ func take_hit(_point: Vector3) -> void:
 		return
 	health -= 1
 	_flash()
+	load("res://scripts/systems/sfx.gd").play("wood_splinter", get_parent(), global_position)
 	_crew_fall()
 	if health <= 0:
 		_sink_now()
@@ -221,6 +222,7 @@ func _collide(handling: Node, fwd: Vector3, right: Vector3, delta: float) -> voi
 func _fire_broadside(right: Vector3) -> void:
 	reload_left = reload_seconds
 	broadside.emit()
+	load("res://scripts/systems/sfx.gd").play("cannon_fire", get_parent(), global_position, -2.0)
 	for i in balls_per_broadside:
 		var aim_at: Vector3 = target.global_position + target.global_basis.x * _rng.randf_range(-6.0, 7.0)
 		if _rng.randf() > accuracy:

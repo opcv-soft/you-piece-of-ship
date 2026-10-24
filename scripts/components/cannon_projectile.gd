@@ -64,6 +64,7 @@ func _struck_at(point: Vector3) -> Node3D:
 func _hit(struck: Node3D) -> void:
 	var at := Vector3(global_position.x, 0.0, global_position.z)
 	HitFX.play(at, get_parent(), struck)
+	load("res://scripts/systems/sfx.gd").play("cannon_impact", get_parent(), at)
 	var ship := get_tree().get_first_node_in_group("player_ship") as Node3D
 	if struck == ship:
 		var voyage := get_tree().get_first_node_in_group("voyage")
@@ -109,6 +110,7 @@ static func _on_ship(ship: Node3D, point: Vector3) -> bool:
 
 
 func _splash() -> void:
+	load("res://scripts/systems/sfx.gd").play("splash", get_parent(), Vector3(target.x, 0.0, target.z), -4.0)
 	var splash := CPUParticles3D.new()
 	splash.one_shot = true
 	splash.amount = 24

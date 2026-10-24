@@ -105,6 +105,7 @@ func fire(player: Node3D = null) -> bool:
 	world.add_child(ball)
 	ball.launch(start, landing_point(), flight_seconds)
 	_kick()
+	load("res://scripts/systems/sfx.gd").play("cannon_fire", self, global_position)
 	fired.emit(ball)
 	return true
 

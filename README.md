@@ -69,3 +69,4 @@ English and French. The game follows the computer's language; switch it any time
 
 ## Credits
 - Realistic ocean: [godot4-oceanfft](https://github.com/tessarakkt/godot4-oceanfft) by Tessa Avery (MIT), in `addons/tessarakkt.oceanfft/`. Switch it off in Settings → "Realistic sea" to get the painted sea back.
+- Sound effects: original, synthesised by `tools/make_sfx.py` (no third-party samples).

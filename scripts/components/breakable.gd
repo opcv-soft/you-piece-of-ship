@@ -7,6 +7,10 @@ extends Node
 signal destroyed(obstacle: Node3D)
 
 const LootScene = preload("res://scripts/components/loot.gd")
+const Sfx = preload("res://scripts/systems/sfx.gd")
+## What breaking each kind sounds like.
+const SOUNDS := {"rock": "rock_crack", "wreck": "wood_splinter", "barrel": "barrel_burst", "siren": "siren_shriek",
+		"whale": "whale_moan"}
 ## kind -> [health, loot pieces, points each]
 const KINDS := {"rock": [3, 1, 25], "wreck": [4, 3, 60], "siren": [3, 3, 60], "barrel": [1, 1, 40]}
 
@@ -30,6 +34,8 @@ func hit(damage := 1) -> bool:
 		return false
 	health -= damage
 	_shudder()
+	if health > 0:
+		Sfx.play(SOUNDS.get(_obstacle.kind, "rock_crack"), _obstacle, _obstacle.global_position, -8.0, 0.2) # a crack, not yet a break
 	if health <= 0:
 		_burst()
 		return true
@@ -54,6 +60,7 @@ func _burst() -> void:
 	_obstacle.remove_from_group("rocks")
 	_obstacle.remove_from_group("obstacles")
 	destroyed.emit(_obstacle)
+	Sfx.play(SOUNDS.get(_obstacle.kind, "rock_crack"), _obstacle.get_parent(), _obstacle.global_position, 2.0)
 	var settings: Array = KINDS[_obstacle.kind]
 	var world := _obstacle.get_parent()
 	for i in settings[1]:
