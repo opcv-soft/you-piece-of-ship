@@ -8,28 +8,38 @@ signal got_away(player: Node3D)
 
 const Toon = preload("res://scripts/systems/toon.gd")
 const MODELS := "res://assets/art/export/models/"
-## [name, model, points, chance weight]
+## [name, model, points, chance weight] (weights are the defaults; the Fishing dev sliders override them)
 const CATCHES := [
-	["Sardine", "fish_sardine", 20, 55.0],
-	["Goldfish", "fish_goldfish", 50, 20.0],
-	["Squid", "fish_squid", 40, 12.0],
-	["Pufferfish", "fish_pufferfish", 35, 10.0],
-	["Treasure!", "chest", 150, 3.0],
+	["Sardine", "fish_sardine", 20, 70.0],
+	["Goldfish", "fish_goldfish", 50, 12.0],
+	["Squid", "fish_squid", 40, 9.0],
+	["Pufferfish", "fish_pufferfish", 35, 8.0],
+	["Treasure!", "chest", 150, 1.0],
 ]
 
 enum Phase { IDLE, WAITING, BITE, REELING }
 
 const ItemScene = preload("res://scenes/greybox/item.tscn")
 
-@export var bite_min := 3.0 ## seconds before a fish bites, at least
-@export var bite_max := 8.0
-@export var bite_window := 0.9 ## seconds to strike once the float dips
+# Olivier, 2026-10-24: "Reduce the frequency of fish success, increase randomness, add dev controls".
+@export_range(1.0, 30.0, 0.5) var bite_min := 6.0 ## seconds before something tugs, at least
+@export_range(1.0, 60.0, 0.5) var bite_max := 18.0
+@export_range(0.0, 0.9, 0.05) var nibble_chance := 0.5 ## a tug is just a nibble (strike = too early)
+@export_range(0.2, 2.0, 0.05) var bite_window_min := 0.45 ## seconds to strike on a real bite
+@export_range(0.2, 2.0, 0.05) var bite_window_max := 0.8
+@export_range(0.0, 100.0, 1.0) var sardine_weight := 70.0
+@export_range(0.0, 100.0, 1.0) var goldfish_weight := 12.0
+@export_range(0.0, 100.0, 1.0) var squid_weight := 9.0
+@export_range(0.0, 100.0, 1.0) var pufferfish_weight := 8.0
+@export_range(0.0, 100.0, 0.5) var treasure_weight := 1.0
 @export var cast_distance := 3.2 ## metres out from the rail
 @export var reel_seconds := 1.3 ## reeling the catch in, over the rail and onto the deck
 
 var phase := Phase.IDLE
 var wait_left := 0.0
 var bite_left := 0.0
+var bite_window := 0.6 ## this bite's strike window (rolled between bite_window_min and _max)
+var nibble_left := 0.0
 var catches := 0
 
 var _rng := RandomNumberGenerator.new()
@@ -135,7 +145,8 @@ func release(player: Node3D) -> void:
 
 func _cast() -> void:
 	phase = Phase.WAITING
-	wait_left = _rng.randf_range(bite_min, bite_max)
+	nibble_left = 0.0
+	wait_left = _rng.randf_range(bite_min, maxf(bite_min, bite_max))
 	_show_tackle(true)
 
 
@@ -156,7 +167,7 @@ func strike(player: Node3D) -> void:
 		_start_reel(catch)
 		return
 	elif phase == Phase.WAITING:
-		player.think(tr("Too early!"), 1.2)
+		player.think(tr("Too early!") if nibble_left > 0.0 else tr("Nothing yet..."), 1.2)
 		got_away.emit(player)
 	elif phase == Phase.REELING:
 		return # busy bringing one in
@@ -216,13 +227,15 @@ func _land_catch() -> void:
 
 ## Picks what bites, by weight.
 func roll_catch() -> Dictionary:
+	var weights := [sardine_weight, goldfish_weight, squid_weight, pufferfish_weight, treasure_weight]
 	var total := 0.0
-	for entry in CATCHES:
-		total += entry[3]
+	for weight in weights:
+		total += weight
 	var pick := _rng.randf() * total
-	for entry in CATCHES:
-		pick -= entry[3]
-		if pick <= 0.0:
+	for i in CATCHES.size():
+		var entry: Array = CATCHES[i]
+		pick -= weights[i]
+		if pick <= 0.0 and weights[i] > 0.0:
 			return {"name": entry[0], "model": entry[1], "points": entry[2]}
 	return {"name": CATCHES[0][0], "model": CATCHES[0][1], "points": CATCHES[0][2]}
 
@@ -232,11 +245,20 @@ func _physics_process(delta: float) -> void:
 	match phase:
 		Phase.WAITING:
 			wait_left -= delta
+			nibble_left -= delta
 			if wait_left <= 0.0:
-				phase = Phase.BITE
-				bite_left = bite_window
-				if occupant:
-					occupant.think("!", bite_window, "shout")
+				if _rng.randf() < nibble_chance:
+					# Just a nibble: the float twitches, then nothing. Strike now and it's scared off.
+					nibble_left = 0.6
+					wait_left = _rng.randf_range(bite_min * 0.3, bite_max * 0.5)
+					if occupant:
+						occupant.think("?", 0.6)
+				else:
+					phase = Phase.BITE
+					bite_window = _rng.randf_range(bite_window_min, maxf(bite_window_min, bite_window_max))
+					bite_left = bite_window
+					if occupant:
+						occupant.think("!", bite_window, "shout")
 		Phase.REELING:
 			_reel(delta)
 			_update_line()
@@ -256,6 +278,8 @@ func _physics_process(delta: float) -> void:
 func _float_bobber() -> void:
 	var side := signf(position.z) if position.z != 0.0 else 1.0
 	var dip := -0.35 if phase == Phase.BITE and fmod(_time, 0.3) < 0.15 else 0.0
+	if nibble_left > 0.0 and phase == Phase.WAITING:
+		dip = -0.12 if fmod(_time, 0.2) < 0.1 else 0.0
 	# The float sits on the sea surface (the ship's deck is 1.2 m above it).
 	var sea_y := to_local(Vector3(0, 0.05, 0) + global_position * Vector3(1, 0, 1)).y
 	_bobber.position = Vector3(0.0, sea_y + sin(_time * 2.0) * 0.06 + dip, side * cast_distance)

@@ -70,3 +70,4 @@ English and French. The game follows the computer's language; switch it any time
 ## Credits
 - Realistic ocean: [godot4-oceanfft](https://github.com/tessarakkt/godot4-oceanfft) by Tessa Avery (MIT), in `addons/tessarakkt.oceanfft/` (its surface shader is modified here: hull mask, calm water by the hull, edge foam). Switch it off in Settings → "Realistic sea" to get the painted sea back.
 - Sound effects: original, synthesised by `tools/make_sfx.py` (no third-party samples).
+- **Placeholder voice — replace before a commercial release:** the countdown's pirate shouts (`assets/audio/sfx/pirate_stations.wav`, `pirate_set_sail.wav`) are made with the macOS `say` voice "Ralph", pitched down and roughened with ffmpeg. Apple's system voices aren't licensed for shipping in a commercial game: record a real voice actor (or a licensed TTS) before release.

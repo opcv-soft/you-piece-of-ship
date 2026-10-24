@@ -6,7 +6,7 @@ extends Node
 
 const ThoughtBubble = preload("res://scripts/components/thought_bubble.gd")
 
-@export_range(0.0, 1.0) var backing_opacity := 0.75 ## dark backing behind prompts and HUD text
+@export_range(0.0, 1.0) var backing_opacity := 0.3 ## dark backing behind prompts and HUD text
 
 var _bubbles := {} ## player -> bubble
 var _hud_boxes: Array[StyleBoxFlat] = []

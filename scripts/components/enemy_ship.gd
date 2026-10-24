@@ -1,14 +1,14 @@
 extends Node3D
 ## A pirate ship that hunts you (Olivier, 2026-10-22). It comes alongside on one side and fires a
 ## broadside whenever it is level with you; it only ever attacks from the side, where your cannons
-## are. Outrun it (it's a little slower than your full speed) or sink it with three hits for loot.
+## are. Outrun it (it's a little slower than your full speed) or sink it with three hits for its planks.
 
 signal sunk(enemy: Node3D)
 signal broadside
 
 const Projectile = preload("res://scripts/components/cannon_projectile.gd")
 const Toon = preload("res://scripts/systems/toon.gd")
-const LootScene = preload("res://scripts/components/loot.gd")
+const Salvage = preload("res://scripts/components/salvage.gd")
 ## The pirate's paint: plum hull stripes, dark sails, a black flag.
 const TINTS := {"paint_teal": Color(0.45, 0.3, 0.55), "paint_red": Color(0.3, 0.2, 0.32), "trim_cream": Color(0.75, 0.7, 0.8),
 		"flag": Color(0.12, 0.1, 0.14), "sail": Color(0.55, 0.5, 0.62), "wood_hull": Color(0.38, 0.26, 0.24)}
@@ -142,12 +142,11 @@ func _sink_now() -> void:
 	remove_from_group("enemy_ships")
 	sunk.emit(self)
 	UI.play("coin")
-	for i in 3:
-		var loot := LootScene.new()
-		loot.resource = "planks" # a sunk pirate ship: planks for repairs
-		loot.value = 2
-		get_parent().add_child(loot)
-		loot.global_position = global_position + Vector3(_rng.randf_range(-6, 6), 0, _rng.randf_range(-4, 4))
+	var salvage := Salvage.new()
+	salvage.resource = "planks" # a sunk pirate ship: its planks swoosh into our plank box
+	salvage.units = 6
+	get_parent().add_child(salvage)
+	salvage.global_position = global_position * Vector3(1, 0, 1)
 
 
 func _physics_process(delta: float) -> void:

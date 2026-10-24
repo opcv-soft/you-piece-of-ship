@@ -102,6 +102,7 @@ func groups() -> Dictionary:
 		"Game feel": [voyage.get_node("GameFeel")],
 		"Crew": voyage.get_tree().get_nodes_in_group("crew"),
 		"AI crew": voyage.get_tree().get_nodes_in_group("ai_crew"),
+		"Fishing": voyage.get_tree().get_nodes_in_group("fishing_spots"),
 	}
 	for extra in voyage.get_tree().get_nodes_in_group("dev_tunable"):
 		found[extra.get_meta("dev_group", extra.name)] = [extra]

@@ -175,3 +175,10 @@ Decision: KEPT / REVERTED — why
 - Lookout up the mast with a spyglass instead of the map table. Siren should pull the ship; everything should be shootable or rammable for loot.
 - Test Drive mode; camera min distance 30, reserve right 0.1; impacts should scale with speed; collision should match the visuals.
 - Dropped cannonballs roll and knock crew over; a big shovel whose coal spills into smears that crew track around; 1700s only (no lamps).
+
+## 2026-10-24 night — Olivier's tweak batch
+- Backing opacity 0.3; pins and planks on the foredeck; pirate voice "AT YOURRRR STATIONS!" for the countdown.
+- "The mast is in the way, it hides what is behind" → rigging see-through; cannons moved forward of the mast.
+- Smashed things should break into pieces that float, then get swooshed into the right pile on the boat.
+- "The waves do not appear AT ALL. You can remove the whole wave mechanic for now" → big waves off behind a flag.
+- Fishing succeeds too often → rarer, more random, dev sliders.

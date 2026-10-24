@@ -38,6 +38,7 @@ func test_strike_on_a_bite_catches_a_fish_and_scores() -> void:
 	spot.strike(fisher)
 	assert_signal_emitted(spot, "got_away", "too early scares the fish")
 	assert_eq(_level.bonus_points, 0)
+	spot.nibble_chance = 0.0
 	spot.wait_left = 0.0
 	await wait_physics_frames(2)
 	assert_eq(spot.phase, spot.Phase.BITE)

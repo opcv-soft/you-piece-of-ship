@@ -8,7 +8,7 @@ extends Sprite3D
 @export var font_size := 30
 
 ## Opacity of the dark backing behind prompts and HUD text (Developer → Tune → Legibility).
-static var backing_opacity := 0.75
+static var backing_opacity := 0.3
 
 var text := ""
 var style := "think"

@@ -39,7 +39,7 @@ func idle_work(delta: float) -> void:
 			return
 	if carrying == null and ship.get_node("PlankBox").stock > 1:
 		var box: Node3D = ship.get_node("PlankBox")
-		if ai._walk_to(box.global_position, delta, 0.9):
+		if ai._walk_to(box.global_position, delta, 1.6): # up on the forecastle: reach from the step
 			ai._use_on(box)
 		return
 	if carrying and carrying.kind != "plank":
@@ -71,8 +71,8 @@ func _free_fishing_spot() -> Node3D:
 ## Fishing: strike when the float dips (most of the time: nobody's perfect).
 func fish() -> void:
 	var spot: Node3D = ai._player.station
-	if spot.phase == spot.Phase.BITE and spot.bite_left < spot.bite_window - 0.25:
-		if ai._rng.randf() < 0.75:
+	if spot.phase == spot.Phase.BITE and spot.bite_left < spot.bite_window - 0.2:
+		if ai._rng.randf() < 0.6:
 			ai._player.jump_requested = true
 		else:
 			spot.bite_left = 0.0 # missed it

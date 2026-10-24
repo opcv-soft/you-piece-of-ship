@@ -12,6 +12,9 @@ signal recovered(system: String)
 @export var calm_window := 20.0 ## seconds of calm guaranteed after any recovery
 @export var max_failing := 1 ## hazards only start while at most this many systems fail
 @export var skip_after_metres := 200.0
+## The big-wave hazard (warning, roll, knockdown). Off since 2026-10-24: Olivier couldn't see the
+## waves at all. The ocean's ordinary swell and the ship riding it stay. Set true to bring it back.
+@export var big_waves_enabled := false
 
 var waves: Array = [] ## [x, side] in order, from the contract
 var next_wave := 0
@@ -70,6 +73,8 @@ func step(delta: float) -> void:
 	if x > wave[0] + skip_after_metres:
 		next_wave += 1
 		wave_skipped.emit()
+		return
+	if not big_waves_enabled:
 		return
 	if can_start_hazard() and ship.get_node("WaveMotion").big_wave(wave[1]):
 		next_wave += 1

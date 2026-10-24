@@ -1,11 +1,17 @@
 extends RefCounted
 ## The countdown before each run (Olivier, 2026-10-24): 5 seconds for everyone to get to their
 ## posts, the ship held still; each second pops on screen with a tick, then "SET SAIL!".
+## It opens with a pirate shouting "AT YOURRRR STATIONS!" (Olivier, 2026-10-24). The voice lines are
+## placeholders made with macOS `say` + ffmpeg (see README): replace them before a commercial release.
 ## Owned by voyage.gd.
+
+const Sfx = preload("res://scripts/systems/sfx.gd")
+const SHOUT := 1.8 ## seconds the "AT YOUR STATIONS!" call takes, before the numbers
 
 var voyage: Node3D
 var left := 0.0 ## seconds left; 0 = not counting
 var _shown := -1
+var _seconds := 5.0
 
 
 func _init(owner_voyage: Node3D) -> void:
@@ -13,7 +19,8 @@ func _init(owner_voyage: Node3D) -> void:
 
 
 func start(seconds := 5.0) -> void:
-	left = seconds
+	_seconds = seconds
+	left = seconds + SHOUT
 	_shown = -1
 
 
@@ -33,7 +40,17 @@ func step(delta: float) -> bool:
 		voyage._crash_flash = 1.2 # the banner hides itself after a moment
 		_pop(banner)
 		UI.play("stamp")
+		Sfx.play("pirate_set_sail", voyage, null, 0.0, 0.0)
 		return true
+	if left > _seconds:
+		if _shown != 99:
+			_shown = 99
+			banner.text = voyage.tr("AT YOUR STATIONS!")
+			banner.visible = true
+			_pop(banner)
+			Sfx.play("pirate_stations", voyage, null, 0.0, 0.0)
+		return false
+	number = mini(number, int(_seconds))
 	if number != _shown:
 		_shown = number
 		banner.text = str(number)

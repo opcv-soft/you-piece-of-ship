@@ -181,7 +181,7 @@ FR = {
     "Spawn: siren": "Ajouter : sirène", "Spawn: atoll": "Ajouter : atoll", "Sea": "Mer", "Stars": "Étoiles",
     " + fish & loot %d": " + poissons et butin %d", "Next star at %d points": "Prochaine étoile à %d points",
     # Fishing
-    "FISHING": "PÊCHE", "Use: fish": "Utiliser : pêcher", "%s +%d": "%s +%d", "Too early!": "Trop tôt !",
+    "FISHING": "PÊCHE", "Use: fish": "Utiliser : pêcher", "%s +%d": "%s +%d", "Too early!": "Trop tôt !", "Nothing yet...": "Rien pour l'instant...", "AT YOUR STATIONS!": "À VOS POSTES !",
     "It got away...": "Il s'est échappé...", "Gone fishing!": "Je vais pêcher !", "    Fish & loot +%d": "    Pêche et butin +%d",
     # Battles
     "CANNON": "CANON", "Use: aim   Jump: fire": "Utiliser : viser   Saut : feu", "loaded": "chargé", "Loaded!": "Chargé !",
