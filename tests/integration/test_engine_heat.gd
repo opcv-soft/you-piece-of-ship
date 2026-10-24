@@ -198,3 +198,18 @@ func test_full_firebox_lasts_about_150_seconds_at_full_throttle() -> void:
 	assert_gt(_engine.fuel, 0.0)
 	_run(15.0)
 	assert_eq(_engine.fuel, 0.0)
+
+
+func test_crew_track_coal_smears_around_the_deck() -> void:
+	var ship: Node3D = _level.get_node("Ship")
+	var smears: Node = ship.get_node("CoalSmears")
+	smears.add_smear(Vector3(0, 0, 0), 1.0, Vector2(1, 0))
+	var walker: Node3D = _level.get_tree().get_nodes_in_group("crew")[0]
+	walker.position = Vector3(0, 0.05, 0)
+	await wait_physics_frames(3)
+	assert_gt(smears.soot_of(walker), 0.5, "stepped in it: sooty boots")
+	walker.position = Vector3(-4, 0.05, 1.0)
+	await wait_physics_frames(2)
+	walker.position = Vector3(-5, 0.05, 1.0)
+	await wait_physics_frames(2)
+	assert_gt(_level.get_tree().get_nodes_in_group("coal_prints").size(), 0, "black footprints across the deck")

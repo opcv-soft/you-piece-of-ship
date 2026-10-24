@@ -16,14 +16,15 @@ const KINDS := {
 	"coal": {"size": Vector3(0.9, 0.15, 0.35), "color": Color(0.12, 0.12, 0.13), "carry_speed": 0.9, "name": "shovel of coal"},
 	"ball": {"size": Vector3(0.4, 0.4, 0.4), "color": Color(0.2, 0.2, 0.24), "carry_speed": 0.7, "name": "cannonball"},
 	"fish": {"size": Vector3(0.7, 0.3, 0.3), "color": Color(0.6, 0.65, 0.7), "carry_speed": 0.9, "name": "fish"},
+	"gold": {"size": Vector3(0.5, 0.15, 0.5), "color": Color(1.0, 0.8, 0.3), "carry_speed": 0.95, "name": "gold"},
 }
 ## How each kind moves loose on the deck: [static friction, damping]. Cannonballs roll and roll;
 ## fish flop about; crates (treasure chests) are heavy.
-const MOTION := {"ball": [0.01, 0.35], "fish": [0.05, 1.6], "crate": [0.09, 1.2]}
+const MOTION := {"ball": [0.01, 0.35], "fish": [0.05, 1.6], "crate": [0.05, 0.9], "gold": [0.02, 0.6]}
 ## Things heavy and fast enough to knock a sailor over when they slide into them.
 const KNOCKERS := ["crate", "ball"]
 
-@export_enum("plank", "pin", "crate", "coal", "ball", "fish") var kind := "plank"
+@export_enum("plank", "pin", "crate", "coal", "ball", "fish", "gold") var kind := "plank"
 @export var species := "fish_sardine" ## fish only: which model
 @export var value := 0 ## score value delivered to port (cargo crates)
 @export var static_friction := 0.09 ## deck tilt (as gravity fraction) needed before it starts sliding
@@ -56,10 +57,15 @@ func _ready() -> void:
 	add_to_group("interactables")
 	if kind == "crate":
 		add_to_group("cargo")
+	if kind == "gold":
+		add_to_group("gold")
 	if MOTION.has(kind):
 		static_friction = MOTION[kind][0]
 		slide_damping = MOTION[kind][1]
 	ship = _find_ship()
+	if kind == "gold":
+		add_child(_gold_pile())
+		return
 	if ship and "art_style" in ship and ship.art_style == "painted":
 		# Painted props: a treasure chest, a plank, the rudder pin, a shovel of coal.
 		var model: Node3D = ship.prop({"crate": "chest", "plank": "plank", "pin": "pin", "coal": "shovel",
@@ -108,11 +114,36 @@ func distance_to_player(player: Node3D) -> float:
 
 
 func can_interact(player: Node3D) -> bool:
+	if kind == "crate" and carrier == null and player.carried and player.carried.kind == "gold":
+		return distance_to_player(player) <= 1.3 # put spilled gold back in the chest
 	return carrier == null and player.carried == null and distance_to_player(player) <= 1.3
 
 
 func interact(player: Node3D) -> void:
+	if kind == "crate" and player.carried and player.carried.kind == "gold":
+		value += player.carried.value
+		player.carried.consume()
+		return
 	pick_up(player)
+
+
+## A little heap of spilled gold coins.
+func _gold_pile() -> Node3D:
+	var pile := Node3D.new()
+	pile.name = "Mesh"
+	var coin := CylinderMesh.new()
+	coin.top_radius = 0.11
+	coin.bottom_radius = 0.11
+	coin.height = 0.035
+	var toon = load("res://scripts/systems/toon.gd")
+	for i in 7:
+		var piece := MeshInstance3D.new()
+		piece.mesh = coin
+		piece.material_override = toon.material("gold")
+		piece.position = Vector3(randf_range(-0.18, 0.18), 0.02 + (i / 3) * 0.035, randf_range(-0.18, 0.18))
+		piece.rotation = Vector3(randf_range(-0.3, 0.3), 0.0, randf_range(-0.3, 0.3))
+		pile.add_child(piece)
+	return pile
 
 
 func pick_up(player: Node3D) -> void:
@@ -147,13 +178,17 @@ func drop(fling := Vector2.ZERO) -> void:
 
 ## Spills part of a shovel of coal (a hit while carrying it), leaving a black mark on the deck.
 ## Spilling it all uses the shovel up.
-func spill(share: float) -> void:
+func spill(share: float, toward := Vector2.ZERO) -> void:
 	if kind != "coal":
 		return
 	var where := carrier.global_position if carrier else global_position
 	amount *= 1.0 - share
 	if ship and ship.has_method("add_coal_mark"):
-		ship.add_coal_mark(ship.to_local(where), share)
+		var skid := toward
+		if skid.length() < 0.05 and carrier:
+			var moving: Vector3 = ship.global_basis.inverse() * carrier.velocity
+			skid = Vector2(moving.x, moving.z)
+		ship.add_coal_mark(ship.to_local(where), share * 1.6, skid)
 	if amount < 0.05:
 		consume()
 
@@ -172,12 +207,35 @@ func consume() -> void:
 
 func _physics_process(delta: float) -> void:
 	if carrier:
+		if kind == "coal" and get_node_or_null("Mesh") is Node3D and not get_node("Mesh") is Sprite3D:
+			_hold_shovel()
+			return
 		global_position = carrier.global_position + carrier.global_basis.y.normalized() * _carry_height()
 		global_rotation = Vector3(carrier.global_rotation.x, carrier.global_rotation.y, carrier.global_rotation.z)
 		return
-	if lashed or ship == null:
+	if ship == null:
+		return
+	if lashed:
+		_sway()
 		return
 	slide(delta)
+
+
+## The big coal shovel is carried in both arms in front of the sailor, blade first, and the heap
+## of coal on it shrinks as it spills (Olivier, 2026-10-24).
+func _hold_shovel() -> void:
+	var facing: Vector3 = carrier.facing if "facing" in carrier else Vector3(1, 0, 0)
+	facing.y = 0.0
+	if facing.length() < 0.1:
+		facing = Vector3(1, 0, 0)
+	facing = facing.normalized()
+	global_position = carrier.global_position + carrier.global_basis.y.normalized() * 0.95 + facing * 0.55
+	global_rotation = Vector3(0.0, atan2(-facing.z, facing.x), 0.0)
+	var mesh := get_node("Mesh") as Node3D
+	mesh.scale = Vector3.ONE * 1.8
+	var heap := sqrt(clampf(amount, 0.0, 1.0))
+	for lump in mesh.find_children("CoalLump*", "", true, false):
+		lump.scale = Vector3.ONE * maxf(heap, 0.01)
 
 
 ## Held overhead: above the grey-box capsule, or above the (taller) pixel pirate's head.
@@ -218,6 +276,16 @@ func slide(delta: float) -> void:
 			if distance_to_player(player) < 0.75:
 				player.knock_down(velocity.normalized())
 	_animate_loose(delta)
+
+
+## A lashed chest strains in its ropes: it leans and shifts a little with the ship's roll.
+func _sway() -> void:
+	var mesh := get_node_or_null("Mesh") as Node3D
+	if mesh == null or kind != "crate":
+		return
+	var gravity: Vector3 = ship.local_gravity()
+	mesh.position = Vector3(gravity.x, 0.0, gravity.z) * 0.035
+	mesh.rotation = Vector3(-gravity.z * 0.03, 0.0, gravity.x * 0.03)
 
 
 ## A sudden lurch of the ship (a crash, a wave, a cannonball): loose things keep going.

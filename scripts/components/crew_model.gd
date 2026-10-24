@@ -74,6 +74,8 @@ func _process(delta: float) -> void:
 
 ## Hand offsets (left, right) from their rest spots for what the sailor is doing.
 func _hand_pose(swing: float) -> Array:
+	if _player.carried and _player.carried.kind == "coal":
+		return [Vector3(0.12, 0.3, 0.45), Vector3(-0.2, 0.25, 0.35)] # both arms forward on the shovel
 	if _player.carried:
 		return [Vector3(0.18, 1.05, -0.05), Vector3(-0.18, 1.05, -0.05)] # arms up, holding it overhead
 	if _player.station:

@@ -222,9 +222,12 @@ func _lure() -> void:
 		pull = -side * lure_strength * (1.0 - distance / lure_radius) # wheel: +1 turns to port
 	handling.lures[get_instance_id()] = pull
 	# Her song drags the whole ship toward her, harder the closer it gets (Olivier, 2026-10-24).
+	# It fades out close to her rock and lets go for a moment after the ship bumps into something,
+	# so a ship can't get pinned against her.
 	var drag := Vector3.ZERO
-	if distance < lure_radius and distance > radius:
-		drag = offset.normalized() * drag_speed * (1.0 - distance / lure_radius)
+	var close := radius + 9.0
+	if distance < lure_radius and distance > close and handling._cooldown <= 0.0:
+		drag = offset.normalized() * drag_speed * (1.0 - distance / lure_radius) * clampf((distance - close) / 6.0, 0.0, 1.0)
 	handling.drifts[get_instance_id()] = drag
 	if _song:
 		_song.volume_db = lerpf(-30.0, -6.0, clampf(1.0 - distance / (lure_radius * 2.0), 0.0, 1.0))

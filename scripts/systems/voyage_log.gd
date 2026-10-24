@@ -40,6 +40,10 @@ func _ready() -> void:
 	cargo.rope_fraying.connect(func(_c): add("A cargo rope is fraying", "info"))
 	cargo.crate_loose.connect(func(_c): add("A crate broke loose", "bad"))
 	cargo.thrown_overboard.connect(func(crate): add("%s threw a crate overboard", "info", [_who(crate.carrier)]))
+	var chaos := ship.get_node_or_null("CargoChaos")
+	if chaos:
+		chaos.chest_burst.connect(func(_c): add("A chest burst open: gold all over the deck!", "bad"))
+		chaos.gold_lost.connect(func(value): add("%d gold washed overboard", "bad", [value]))
 	waves.wave_warning.connect(func(side): add("Big wave coming from %s!", "info", ["starboard" if side > 0.0 else "port"]))
 	for player in get_tree().get_nodes_in_group("crew"):
 		player.knocked_down.connect(_on_knocked.bind(player))
