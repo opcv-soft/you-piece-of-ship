@@ -15,6 +15,7 @@ func before_each() -> void:
 	add_child_autofree(_level)
 	_ship = _level.get_node("Ship")
 	_director = _level.get_node("HazardDirector")
+	_director.big_waves_enabled = true # off in the game for now (Olivier, 2026-10-24); the rules still hold
 	for player in _level.get_tree().get_nodes_in_group("crew"):
 		player.get_node("PlayerInput").enabled = false
 	await wait_physics_frames(2)

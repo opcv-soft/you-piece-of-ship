@@ -65,7 +65,9 @@ func fetch_and_bring(kind: String, box: Node3D, destination: Node3D, delta: floa
 	ai._drop_carried()
 	var loose: Node3D = ai._brain.loose_item(kind)
 	var source: Node3D = loose if loose else box
-	if ai._walk_to(source.global_position, delta, 1.2): # items can be reached from 1.3 m
+	# Items can be reached from 1.3 m; the spare boxes up on the forecastle from the step below it.
+	var reach := 1.2 if source.is_in_group("items") else minf(1.7, source.radius - 0.2)
+	if ai._walk_to(source.global_position, delta, reach):
 		ai._use_on(source)
 
 

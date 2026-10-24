@@ -1,12 +1,13 @@
 extends Node
 ## Makes an obstacle breakable (Olivier, 2026-10-24: "everything should be shootable with the
 ## cannon or destroyable with the hull... using the cannon to get loot"). Cannonballs and hard rams
-## chip at its health; at zero it bursts apart, sinks, and leaves floating loot to sail through.
+## chip at its health; at zero it bursts apart and sinks, and its salvage swooshes onto the ship
+## (salvage.gd).
 ## A child of the obstacle (rock.gd adds it for the kinds that can break; whales and cliffs can't).
 
 signal destroyed(obstacle: Node3D)
 
-const LootScene = preload("res://scripts/components/loot.gd")
+const Salvage = preload("res://scripts/components/salvage.gd")
 const Sfx = preload("res://scripts/systems/sfx.gd")
 ## What breaking each kind sounds like.
 const SOUNDS := {"rock": "rock_crack", "wreck": "wood_splinter", "barrel": "barrel_burst", "siren": "siren_shriek",
@@ -57,7 +58,7 @@ func _shudder() -> void:
 		UI.play("stamp")
 
 
-## Bursts apart: debris, loot afloat, the remains sink, and it stops being an obstacle.
+## Bursts apart: debris, salvage for the ship, the remains sink, and it stops being an obstacle.
 func _burst() -> void:
 	_obstacle.remove_from_group("rocks")
 	_obstacle.remove_from_group("obstacles")
@@ -65,20 +66,11 @@ func _burst() -> void:
 	Sfx.play(SOUNDS.get(_obstacle.kind, "rock_crack"), _obstacle.get_parent(), _obstacle.global_position, 2.0)
 	var settings: Array = KINDS[_obstacle.kind]
 	var world := _obstacle.get_parent()
-	if settings[2] == "siren":
-		var ship := _obstacle.get_tree().get_first_node_in_group("player_ship")
-		if ship and ship.has_node("ShipStores"):
-			var points: int = ship.get_node("ShipStores").add("siren", 1)
-			var voyage := _obstacle.get_tree().get_first_node_in_group("voyage")
-			if voyage and "bonus_points" in voyage:
-				voyage.bonus_points += points
-	for i in settings[1]:
-		var loot := LootScene.new()
-		loot.resource = settings[2]
-		loot.value = settings[3]
-		world.add_child(loot)
-		var spread: float = _obstacle.radius * 0.8
-		loot.global_position = _obstacle.global_position + Vector3(randf_range(-spread, spread), 0.0, randf_range(-spread, spread))
+	var salvage := Salvage.new()
+	salvage.resource = settings[2]
+	salvage.units = maxi(1, settings[1]) * settings[3]
+	world.add_child(salvage)
+	salvage.global_position = _obstacle.global_position * Vector3(1, 0, 1)
 	_debris()
 	var sink := _obstacle.create_tween()
 	sink.tween_property(_obstacle, "position:y", -6.0, 1.6).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
@@ -94,7 +86,7 @@ func _debris() -> void:
 	var chunk := BoxMesh.new()
 	chunk.size = Vector3(0.4, 0.3, 0.3)
 	var colour := StandardMaterial3D.new()
-	colour.albedo_color = Color(0.55, 0.5, 0.48) if _obstacle.kind == "rock" else Color(0.55, 0.36, 0.22)
+	colour.albedo_color = Color(0.12, 0.11, 0.12) if _obstacle.kind == "rock" else Color(0.55, 0.36, 0.22)
 	chunk.material = colour
 	chunks.mesh = chunk
 	chunks.direction = Vector3.UP

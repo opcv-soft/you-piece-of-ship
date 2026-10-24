@@ -279,7 +279,7 @@ script = ExtResource("18_lookout")
 [node name="Items" type="Node3D" parent="."]
 
 [node name="PlankBox" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.4, 0, -2.1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.0, 0.62, -0.4)
 script = ExtResource("5_dispenser")
 kind = "plank"
 stock = 4
@@ -298,11 +298,11 @@ outline_size = 12
 text = "PLANKS"
 
 [node name="PlankBoxBody" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.4, 0.35, -2.95)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.0, 0.97, -1.25)
 shape = SubResource("shape_dispenser")
 
 [node name="PinBox" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.6, 0, -2.1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.0, 0.62, 2.1)
 script = ExtResource("5_dispenser")
 kind = "pin"
 stock = 1
@@ -321,7 +321,7 @@ outline_size = 12
 text = "PINS"
 
 [node name="PinBoxBody" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.6, 0.35, -2.95)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.0, 0.97, 1.25)
 shape = SubResource("shape_dispenser")
 
 [node name="CargoBay" type="Node3D" parent="."]
@@ -376,11 +376,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 0, -2.3)
 script = ExtResource("7_breach")
 
 [node name="Leak3" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, 0, 2.3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0, 2.3)
 script = ExtResource("7_breach")
 
 [node name="Leak4" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6, 0, -2.3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0, -2.3)
 script = ExtResource("7_breach")
 
 [node name="Leak5" type="Node3D" parent="."]

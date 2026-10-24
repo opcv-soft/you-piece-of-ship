@@ -24,8 +24,8 @@ func after_each() -> void:
 
 func _collect_all() -> void:
 	await wait_physics_frames(2)
-	for loot in get_tree().get_nodes_in_group("loot"):
-		loot.collect()
+	for salvage in get_tree().get_nodes_in_group("salvage"):
+		salvage.land_all()
 
 
 func test_barrels_give_gold_in_the_bucket() -> void:
@@ -55,6 +55,7 @@ func test_the_siren_ends_up_on_the_bowsprit_and_whales_give_grease() -> void:
 	var siren: Node3D = _level._spawn_ahead("siren")
 	for i in 3:
 		siren.take_hit()
+	await _collect_all()
 	assert_eq(_stores.counts.siren, 1)
 	assert_not_null(_stores.get_node_or_null("Siren1"), "skewered on the bowsprit")
 	var whale: Node3D = _level._spawn_ahead("whale")
@@ -62,6 +63,15 @@ func test_the_siren_ends_up_on_the_bowsprit_and_whales_give_grease() -> void:
 		whale.take_hit()
 	await _collect_all()
 	assert_eq(_stores.counts.grease, 1)
+
+
+func test_debris_floats_then_swooshes_into_its_pile_by_itself() -> void:
+	_level._spawn_ahead("barrel").take_hit()
+	await wait_physics_frames(2)
+	assert_eq(_stores.counts.gold, 0, "the pieces bob on the water first")
+	await wait_seconds(3.0)
+	assert_gt(_stores.counts.gold, 0, "then they fly into the bucket")
+	assert_eq(get_tree().get_nodes_in_group("salvage").size(), 0)
 
 
 func test_at_the_beach_the_haul_goes_to_the_village() -> void:

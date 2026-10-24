@@ -41,7 +41,6 @@ static func maiden_voyage() -> Resource:
 		[120, "hint", "Buoys ahead! Navigator: stand at the MAP TABLE and call where they are."],
 		[360, "leak", "A wave cracked the hull! Fetch a PLANK, put it on the LEAK, hammer it. Someone: PUMP!"],
 		[520, "heat", "Headwind! The engine runs hot. Engineer: at the ENGINE, Jump vents steam (stand clear!)."],
-		[680, "hint", "Big wave coming: grab a station so you don't fall over!"],
 		[880, "rudder", "Rudder trouble! Bring the PIN to the HELM. Two problems at once: split up!"],
 		[880, "leak", ""],
 		[1040, "hint", "Port ahead! Steer between the yellow buoys."],

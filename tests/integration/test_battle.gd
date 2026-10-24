@@ -55,7 +55,7 @@ func test_load_aim_fire_and_hit_a_pirate() -> void:
 	assert_eq(enemy.health, 2, "a hit")
 
 
-func test_three_hits_sink_it_and_loot_floats_up() -> void:
+func test_three_hits_sink_it_and_its_planks_swoosh_aboard() -> void:
 	var enemy: Node3D = _level.spawn_enemy(-1.0)
 	watch_signals(enemy)
 	for i in 3:
@@ -63,10 +63,10 @@ func test_three_hits_sink_it_and_loot_floats_up() -> void:
 	assert_signal_emitted(enemy, "sunk")
 	assert_false(enemy.is_threat())
 	await wait_physics_frames(2)
-	var loot := get_tree().get_nodes_in_group("loot")
-	assert_eq(loot.size(), 3)
-	loot[0].collect()
-	assert_eq(_level.bonus_points, 40, "a sunk ship gives planks (2 x 20 points)")
+	var salvage := get_tree().get_nodes_in_group("salvage")
+	assert_eq(salvage.size(), 1)
+	salvage[0].land_all()
+	assert_eq(_level.bonus_points, 120, "a sunk ship gives planks (6 x 20 points)")
 
 
 func test_an_enemy_ball_on_deck_cracks_the_hull() -> void:

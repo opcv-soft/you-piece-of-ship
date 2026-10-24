@@ -302,6 +302,8 @@ FISHING,FISHING,PÊCHE
 Use: fish,Use: fish,Utiliser : pêcher
 %s +%d,%s +%d,%s +%d
 Too early!,Too early!,Trop tôt !
+Nothing yet...,Nothing yet...,Rien pour l'instant...
+AT YOUR STATIONS!,AT YOUR STATIONS!,À VOS POSTES !
 It got away...,It got away...,Il s'est échappé...
 Gone fishing!,Gone fishing!,Je vais pêcher !
     Fish & loot +%d,    Fish & loot +%d,    Pêche et butin +%d

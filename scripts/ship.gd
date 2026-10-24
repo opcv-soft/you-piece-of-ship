@@ -14,12 +14,13 @@ const CargoChaos = preload("res://scripts/components/cargo_chaos.gd")
 const EngineSound = preload("res://scripts/components/engine_sound.gd")
 const ShipStores = preload("res://scripts/components/ship_stores.gd")
 ## Fishing spots along the starboard rail, clear of the leak spots and stations.
-const FISHING_SPOTS := [Vector3(5.6, 0.0, 2.75), Vector3(8.3, 0.0, 2.6)]
+const FISHING_SPOTS := [Vector3(0.4, 0.0, 2.75), Vector3(-0.6, 0.0, -2.75)]
 const Cannon = preload("res://scripts/components/cannon.gd")
 const ItemDispenser = preload("res://scripts/components/item_dispenser.gd")
 ## Two cannons a side, at the gunports, clear of the leak spots and stations.
 ## Same spots on both sides, facing each other (Olivier, 2026-10-24: they were misaligned).
-const CANNONS := [Vector3(-0.8, 0.0, -2.8), Vector3(2.6, 0.0, -2.8), Vector3(-0.8, 0.0, 2.8), Vector3(2.6, 0.0, 2.8)]
+## Forward of the mast so it never hides them (2026-10-24).
+const CANNONS := [Vector3(4.2, 0.0, -2.8), Vector3(6.8, 0.0, -2.8), Vector3(4.2, 0.0, 2.8), Vector3(6.8, 0.0, 2.8)]
 const BALL_RACK := Vector3(-1.4, 0.0, 0.3)
 const Toon = preload("res://scripts/systems/toon.gd")
 const SHIP_MODEL := "res://assets/art/export/models/ship.glb"
@@ -91,7 +92,11 @@ func _paint() -> void:
 	var model: Node3D = (load(SHIP_MODEL) as PackedScene).instantiate()
 	model.name = "Model"
 	Toon.paint(model)
+	_fade_rigging(model)
 	add_child(model)
+	# The spare boxes sit up on the forecastle, reached from the main deck below (Olivier, 2026-10-24).
+	for box in ["PlankBox", "PinBox"]:
+		get_node(box).radius = 1.8
 	for station_name in STATION_PROPS:
 		var station := get_node(station_name)
 		for child in station.get_children():
@@ -133,6 +138,17 @@ func _add_ball_rack() -> void:
 	if art_style == "painted":
 		rack.add_child(prop("ball_rack", "Painted"))
 	add_child(rack)
+
+
+## The mast, crow's nest, yard and rigging are see-through, so they never hide the crew, the
+## cannons or anything behind them (Olivier, 2026-10-24).
+func _fade_rigging(model: Node3D) -> void:
+	for mesh in model.find_children("*", "MeshInstance3D", true, false):
+		var part := String(mesh.name)
+		if part.begins_with("Mast") or part.begins_with("CrowsNest") or part.begins_with("Yard") or part.begins_with("Shroud") \
+				or part == "Flag":
+			for i in mesh.mesh.get_surface_count():
+				mesh.set_surface_override_material(i, Toon.see_through(mesh.get_surface_override_material(i), 0.4))
 
 
 ## A painted model from assets/art/export/models/ (toon-painted, ready to add).

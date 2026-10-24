@@ -125,6 +125,10 @@ func _walk_to(point: Vector3, delta: float, arrive := arrive_distance) -> bool:
 		_progress_check = 0.6
 		return true
 	var direction := Vector2(to.x, to.z).normalized()
+	var around := _around_mast(point)
+	if around != Vector3.INF:
+		var detour := around - _player.global_position
+		direction = Vector2(detour.x, detour.z).normalized()
 	if _sidestep_left > 0.0:
 		_sidestep_left -= delta
 		direction = (direction * 0.4 + _sidestep).normalized()
@@ -139,6 +143,25 @@ func _walk_to(point: Vector3, delta: float, arrive := arrive_distance) -> bool:
 			_sidestep_left = 0.7
 		_last_position = _player.global_position
 	return false
+
+
+## Walking across the mast's line (e.g. to the boxes on the forecastle)? Go round it: a waypoint
+## beside the mast, on whichever side is shorter. INF if the way is clear.
+func _around_mast(point: Vector3) -> Vector3:
+	if _ship == null:
+		return Vector3.INF
+	const MAST := Vector2(1.0, 0.0) # ship frame, x = bow, y = starboard
+	var from3 := _ship.to_local(_player.global_position)
+	var to3 := _ship.to_local(point)
+	var from := Vector2(from3.x, from3.z)
+	var to := Vector2(to3.x, to3.z)
+	if signf(from.x - MAST.x) == signf(to.x - MAST.x) or absf(from.x - MAST.x) < 0.3:
+		return Vector3.INF
+	var closest := Geometry2D.get_closest_point_to_segment(MAST, from, to)
+	if closest.distance_to(MAST) > 0.9:
+		return Vector3.INF
+	var side := signf(from.y + to.y) if absf(from.y + to.y) > 0.05 else 1.0
+	return _ship.to_global(Vector3(MAST.x, 0.0, MAST.y + side * 1.3))
 
 
 func _press_use() -> void:
