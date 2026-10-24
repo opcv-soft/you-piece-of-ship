@@ -16,7 +16,8 @@ const FISHING_SPOTS := [Vector3(5.6, 0.0, 2.75), Vector3(8.3, 0.0, 2.6)]
 const Cannon = preload("res://scripts/components/cannon.gd")
 const ItemDispenser = preload("res://scripts/components/item_dispenser.gd")
 ## Two cannons a side, at the gunports, clear of the leak spots and stations.
-const CANNONS := [Vector3(2.4, 0.0, -2.8), Vector3(5.9, 0.0, -2.8), Vector3(-0.4, 0.0, 2.8), Vector3(2.0, 0.0, 2.8)]
+## Same spots on both sides, facing each other (Olivier, 2026-10-24: they were misaligned).
+const CANNONS := [Vector3(-0.8, 0.0, -2.8), Vector3(2.6, 0.0, -2.8), Vector3(-0.8, 0.0, 2.8), Vector3(2.6, 0.0, 2.8)]
 const BALL_RACK := Vector3(-1.4, 0.0, 0.3)
 const Toon = preload("res://scripts/systems/toon.gd")
 const SHIP_MODEL := "res://assets/art/export/models/ship.glb"

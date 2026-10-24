@@ -4,7 +4,7 @@ extends Camera3D
 ## (Social: one screen, one crew, nobody hunting for themselves).
 
 @export var target_group := "camera_focus" ## crew members and the ship's corner markers
-@export_range(20.0, 85.0) var view_pitch_degrees := 55.0 ## how steeply we look down
+@export_range(20.0, 85.0) var view_pitch_degrees := 40.0 ## how steeply we look down (40: the sea looks good, the deck stays readable)
 @export var margin := 2.5 ## metres of room around the outermost point
 @export var look_ahead := 14.0 ## metres of sea kept in view beyond the bow, to see what's coming
 @export_range(0.0, 0.5) var reserve_right := 0.0 ## share of the screen kept free on the right for the HUD (map chart)

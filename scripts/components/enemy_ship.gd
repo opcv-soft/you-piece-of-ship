@@ -109,12 +109,6 @@ func _physics_process(delta: float) -> void:
 		return
 	if target == null:
 		return
-	# Close by: the camera pulls back to show the fight.
-	if is_threat() != is_in_group("camera_focus"):
-		if is_threat():
-			add_to_group("camera_focus")
-		else:
-			remove_from_group("camera_focus")
 	var handling := target.get_node("ShipHandling")
 	var fwd: Vector3 = handling.forward()
 	var right := Vector3(-fwd.z, 0.0, fwd.x)

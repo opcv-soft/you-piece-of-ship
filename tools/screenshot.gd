@@ -31,6 +31,8 @@ func _run() -> void:
 	current_scene = level
 	if level.has_method("_apply_crew"):
 		level._apply_crew([] as Array[int])
+	if args.has("pitch") and level.has_node("SharedCamera"):
+		level.get_node("SharedCamera").view_pitch_degrees = float(args.pitch)
 	await create_timer(float(args.get("wait", "3"))).timeout
 	for event in String(args.get("events", "")).split(",", false) if level.has_method("dev_event") else []:
 		level.dev_event(event)

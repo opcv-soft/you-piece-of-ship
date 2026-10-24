@@ -74,6 +74,11 @@ func _process(delta: float) -> void:
 	if near:
 		lines.append(tr("Use: fill a shovel"))
 	label.text = "\n".join(lines)
+	label.visible = wetness > 0.2 # only the alert; prompts tell players the rest (interaction_prompts.gd)
+
+
+func prompt_text(_player: Node3D) -> String:
+	return tr("COAL") + ("  " + tr("WET!") if wetness > 0.2 else "") + "\n" + tr("Use: fill a shovel")
 
 
 func distance_to_player(player: Node3D) -> float:

@@ -346,6 +346,12 @@ Up the mast!,Up the mast!,En haut du mât !
 A chest burst open: gold all over the deck!,A chest burst open: gold all over the deck!,Un coffre a éclaté : de l'or partout sur le pont !
 %d gold washed overboard,%d gold washed overboard,%d pièces d'or emportées par-dessus bord
 gold,gold,or
+SET SAIL!,SET SAIL!,LARGUEZ !
+Use: let go,Use: let go,Utiliser : lâcher
+Use: pick up %s,Use: pick up %s,Utiliser : prendre %s
+Use: put the gold back in,Use: put the gold back in,Utiliser : remettre l'or dedans
+Legibility,Legibility,Lisibilité
+Use,Use,Utiliser
 Sail to the beach,Sail to the beach,Aller jusqu'à la plage
 Barrel,Barrel,Tonneau
 Spawn: barrel,Spawn: barrel,Ajouter : tonneau

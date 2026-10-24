@@ -16,6 +16,8 @@ var _phase := 0.0
 var _time := 0.0
 var _blink_in := 2.0
 var _squash := 0.0
+var _faded := false
+var _originals := {} ## mesh -> [surface materials] (to undo the fade)
 
 
 func setup(player: CharacterBody3D, tint: Color, hat_style: String) -> void:
@@ -47,6 +49,7 @@ func _process(delta: float) -> void:
 	if _player == null:
 		return
 	_time += delta
+	_fade(_player.station != null)
 	var speed := Vector2(_player.velocity.x, _player.velocity.z).length()
 	var moving: bool = speed > 0.4 and _player.knocked <= 0.0
 	_phase += delta * (4.0 + speed * 1.6) if moving else 0.0
@@ -70,6 +73,24 @@ func _process(delta: float) -> void:
 		_blink_in = randf_range(2.0, 4.5)
 	for eye in _eyes:
 		eye.scale.y = 0.15 if closed else 1.0
+
+
+## Working a station: the sailor fades so what they work on (the cannon's aim, the dial) shows
+## through them (Olivier, 2026-10-24).
+func _fade(on: bool) -> void:
+	if on == _faded:
+		return
+	_faded = on
+	for mesh in _model.find_children("*", "MeshInstance3D", true, false):
+		var instance := mesh as MeshInstance3D
+		if not _originals.has(instance):
+			var list := []
+			for i in instance.mesh.get_surface_count():
+				list.append(instance.get_surface_override_material(i))
+			_originals[instance] = list
+		for i in instance.mesh.get_surface_count():
+			var original: Material = _originals[instance][i]
+			instance.set_surface_override_material(i, Toon.see_through(original) if on else original)
 
 
 ## Hand offsets (left, right) from their rest spots for what the sailor is doing.

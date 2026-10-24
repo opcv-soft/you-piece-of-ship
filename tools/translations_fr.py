@@ -204,6 +204,8 @@ FR = {
     "Realistic sea": "Mer réaliste", "CROW'S NEST": "NID-DE-PIE", "Use: climb up": "Utiliser : grimper", "Up the mast!": "En haut du mât !",
     "A chest burst open: gold all over the deck!": "Un coffre a éclaté : de l'or partout sur le pont !",
     "%d gold washed overboard": "%d pièces d'or emportées par-dessus bord", "gold": "or",
+    "SET SAIL!": "LARGUEZ !", "Use: let go": "Utiliser : lâcher", "Use: pick up %s": "Utiliser : prendre %s",
+    "Use: put the gold back in": "Utiliser : remettre l'or dedans", "Legibility": "Lisibilité", "Use": "Utiliser",
     "Sail to the beach": "Aller jusqu'à la plage", "Barrel": "Tonneau", "Spawn: barrel": "Ajouter : tonneau",
     "Rock": "Rocher", "Wreck": "Épave", "Whale": "Baleine", "Atoll": "Atoll", "Coast": "Côte",
     "Show collision shapes": "Voir les formes de collision", "Test Drive: open ocean, no obstacles": "Essai libre : océan ouvert, sans obstacles",
