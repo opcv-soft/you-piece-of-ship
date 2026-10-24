@@ -48,7 +48,7 @@ func test_the_siren_pulls_the_wheel_toward_her() -> void:
 
 
 func test_every_kind_has_a_model_and_a_call_name() -> void:
-	for kind in ["rock", "wreck", "whale", "siren", "atoll"]:
+	for kind in ["rock", "wreck", "whale", "siren", "atoll", "barrel"]:
 		var thing: Node3D = _level._spawn_ahead(kind)
 		assert_not_null(thing.get_node_or_null("Model"), kind)
 		assert_ne(thing.call_name(), "")
@@ -60,3 +60,49 @@ func test_the_navigator_names_what_it_sees() -> void:
 	wreck.position = _ship.global_position + Vector3(40, 0, 0)
 	wreck.position.y = 0.0
 	assert_string_contains(ai.callout(), "Wreck")
+
+
+
+func test_cannonballs_break_rocks_and_leave_loot_but_whales_never_break() -> void:
+	var rock: Node3D = _level._spawn_ahead("rock")
+	await wait_physics_frames(1)
+	assert_false(rock.take_hit(), "a rock takes three hits")
+	assert_false(rock.take_hit())
+	assert_true(rock.take_hit(), "third hit: it bursts")
+	assert_false(rock.is_in_group("rocks"), "no longer an obstacle")
+	await wait_physics_frames(2)
+	assert_gt(get_tree().get_nodes_in_group("loot").size(), 0, "loot floats where it was")
+	var whale: Node3D = _level._spawn_ahead("whale")
+	for i in 10:
+		assert_false(whale.take_hit(), "whales are dodge-only")
+
+
+func test_a_cannonball_bursts_a_barrel() -> void:
+	var barrel: Node3D = _level._spawn_ahead("barrel")
+	var ball = load("res://scripts/components/cannon_projectile.gd").new()
+	ball.shooter = _ship
+	_level.add_child(ball)
+	ball.launch(_ship.global_position + Vector3(0, 2, 0), barrel.global_position, 0.3)
+	await wait_seconds(0.6)
+	assert_false(barrel.is_in_group("rocks"), "burst")
+
+
+func test_ramming_a_barrel_smashes_it_without_stopping() -> void:
+	var handling := _ship.get_node("ShipHandling")
+	var barrel: Node3D = _level._spawn_ahead("barrel")
+	barrel.position = _ship.global_position + handling.forward() * 13.0
+	barrel.position.y = 0.0
+	handling.speed = handling.max_speed
+	await wait_physics_frames(3)
+	assert_false(barrel.is_in_group("rocks"), "smashed")
+	assert_gt(handling.speed, handling.max_speed * 0.5, "no bounce off a barrel")
+
+
+func test_the_siren_drags_the_ship_toward_her() -> void:
+	var siren: Node3D = _level._spawn_ahead("siren")
+	siren.position = _ship.global_position + Vector3(20, 0, 12)
+	siren.position.y = 0.0
+	await wait_physics_frames(3)
+	var drift: Vector3 = _ship.get_node("ShipHandling").drifts[siren.get_instance_id()]
+	assert_gt(drift.length(), 0.3, "pulled")
+	assert_gt(drift.dot(siren.global_position - _ship.global_position), 0.0, "toward her")

@@ -12,16 +12,17 @@ extends Node3D
 
 const Toon = preload("res://scripts/systems/toon.gd")
 const PixelArt = preload("res://scripts/systems/pixel_art.gd")
+const Breakable = preload("res://scripts/components/breakable.gd")
 const MODELS := "res://assets/art/export/models/"
 ## kind -> [model, model size at scale 1 (its radius)]
 ## The size is the model's real footprint at the waterline, so what you see is what you hit.
 const LOOKS := {"rock": ["rock", 1.45], "cliff": ["cliff", 1.4], "wreck": ["wreck", 4.4], "whale": ["whale", 4.4],
-		"siren": ["siren", 3.2], "atoll": ["atoll", 12.0]}
+		"siren": ["siren", 3.2], "atoll": ["atoll", 12.0], "barrel": ["barrel", 0.65]}
 ## What the navigator calls each one.
-const CALL_NAMES := {"rock": "Rock", "wreck": "Wreck", "whale": "Whale", "siren": "Siren", "atoll": "Atoll",
+const CALL_NAMES := {"rock": "Rock", "wreck": "Wreck", "whale": "Whale", "siren": "Siren", "atoll": "Atoll", "barrel": "Barrel",
 		"cliff": "Coast"}
 
-@export_enum("rock", "cliff", "wreck", "whale", "siren", "atoll") var kind := "rock"
+@export_enum("rock", "cliff", "wreck", "whale", "siren", "atoll", "barrel") var kind := "rock"
 @export var radius := 3.5 ## metres
 @export var hidden := true ## submerged (reef rocks only): just the chart shows it
 @export_group("Whale")
@@ -32,6 +33,7 @@ const CALL_NAMES := {"rock": "Rock", "wreck": "Wreck", "whale": "Whale", "siren"
 @export_group("Siren")
 @export var lure_radius := 38.0 ## metres: inside this, her song pulls the wheel
 @export var lure_strength := 0.45 ## wheel pull at the closest point (-1..1 scale)
+@export var drag_speed := 2.4 ## metres per second she drags the ship toward her, at her closest
 
 var revealed := false
 var home := Vector3.ZERO
@@ -59,6 +61,8 @@ func _ready() -> void:
 		_greybox()
 	if kind == "siren":
 		_start_song()
+	if Breakable.can_break(kind):
+		add_child(Breakable.new())
 
 
 func _rng_offset() -> void:
@@ -118,6 +122,17 @@ func avoid_centre() -> Vector3:
 
 func avoid_radius() -> float:
 	return radius + swim_amplitude * 0.75 if kind == "whale" else radius
+
+
+## A cannonball or a ram. Returns true if it broke (whales, cliffs and atolls never do).
+func take_hit(_point := Vector3.ZERO, damage := 1) -> bool:
+	var breakable := get_node_or_null("Breakable")
+	return breakable.hit(damage) if breakable else false
+
+
+## Floating barrels just burst when the ship rams them: no bounce, no damage to the hull.
+func is_soft() -> bool:
+	return kind == "barrel"
 
 
 func call_name() -> String:
@@ -206,6 +221,11 @@ func _lure() -> void:
 		var side := signf(offset.dot(right)) # +1: she is to starboard
 		pull = -side * lure_strength * (1.0 - distance / lure_radius) # wheel: +1 turns to port
 	handling.lures[get_instance_id()] = pull
+	# Her song drags the whole ship toward her, harder the closer it gets (Olivier, 2026-10-24).
+	var drag := Vector3.ZERO
+	if distance < lure_radius and distance > radius:
+		drag = offset.normalized() * drag_speed * (1.0 - distance / lure_radius)
+	handling.drifts[get_instance_id()] = drag
 	if _song:
 		_song.volume_db = lerpf(-30.0, -6.0, clampf(1.0 - distance / (lure_radius * 2.0), 0.0, 1.0))
 	if _notes:

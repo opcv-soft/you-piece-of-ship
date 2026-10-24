@@ -4,7 +4,8 @@ extends RefCounted
 
 const RockScene = preload("res://scenes/greybox/rock.tscn")
 const Toon = preload("res://scripts/systems/toon.gd")
-const OBSTACLE_RADIUS := {"wreck": 4.0, "whale": 3.5, "siren": 2.5, "atoll": 12.0, "rock": 3.5}
+const OBSTACLE_RADIUS := {"wreck": 4.0, "whale": 3.5, "siren": 2.5, "atoll": 12.0, "rock": 3.5, "barrel": 1.0}
+const BARREL_SPACING := 130.0 ## metres between floating barrels (cannon targets full of loot)
 
 var voyage: Node3D
 
@@ -27,6 +28,7 @@ func build_route() -> void:
 		var kind: String = entry[2]
 		var size: float = entry[3] if entry.size() > 3 else OBSTACLE_RADIUS.get(kind, 3.5)
 		add_rock(reef, "%s%d" % [kind.capitalize(), count], Vector3(entry[0], 0.0, entry[1]), size, kind == "rock", kind)
+	_add_barrels(reef)
 	# Visible cliffs along both sides keep the ship in the channel.
 	var x := -40.0
 	var i := 0
@@ -37,6 +39,23 @@ func build_route() -> void:
 			add_rock(reef, "Cliff%d" % i, Vector3(x, 0.0, side * (contract.coast_half_width + 6.0 + wobble)), 6.0, false)
 		x += 11.0
 	_build_port()
+
+
+## Floating barrels along the route, off to the sides: shoot them (or ram them) for loot.
+func _add_barrels(reef: Node) -> void:
+	var contract: Resource = voyage.contract
+	if contract.tutorial:
+		return
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash(contract.title)
+	var x := 150.0
+	var n := 0
+	while x < voyage.finish_x - 100.0:
+		n += 1
+		var side := 1.0 if rng.randf() < 0.5 else -1.0
+		var z := side * rng.randf_range(10.0, maxf(12.0, contract.coast_half_width - 12.0))
+		add_rock(reef, "Barrel%d" % n, Vector3(x + rng.randf_range(-30.0, 30.0), 0.0, z), 1.0, false, "barrel")
+		x += BARREL_SPACING
 
 
 func add_rock(parent: Node, rock_name: String, where: Vector3, radius: float, hidden: bool, kind := "") -> Node3D:
