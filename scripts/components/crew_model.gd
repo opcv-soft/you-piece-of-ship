@@ -49,7 +49,7 @@ func _process(delta: float) -> void:
 	if _player == null:
 		return
 	_time += delta
-	_fade(_player.station != null)
+	_fade(_player.station != null and _player.has_node("AICrew")) # never fade a human: you'd lose yourself
 	var speed := Vector2(_player.velocity.x, _player.velocity.z).length()
 	var moving: bool = speed > 0.4 and _player.knocked <= 0.0
 	_phase += delta * (4.0 + speed * 1.6) if moving else 0.0

@@ -29,7 +29,7 @@ func gunner(delta: float) -> void:
 		if absf(wanted - cannon.aim) > 0.06:
 			player.move_input = Vector2(signf(wanted - cannon.aim) * cannon.side, 0.0)
 		else:
-			ai.intend(ai.tr("Fire!"))
+			ai.intend(ai.tr("Fire!"), true)
 			player.jump_requested = true
 		return
 	var loaded := cannon_on(side, true)

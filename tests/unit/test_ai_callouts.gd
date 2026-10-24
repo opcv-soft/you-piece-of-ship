@@ -19,5 +19,7 @@ func test_nautical_bearings_and_distances() -> void:
 	assert_eq(AICrew.nautical_bearing(0.0, -30.0), "on the port beam")
 	assert_eq(AICrew.nautical_bearing(-20.0, 10.0), "off the starboard quarter")
 	assert_eq(AICrew.nautical_bearing(-40.0, 0.0), "dead astern")
-	assert_eq(AICrew.nautical_distance(11.0), "6 fathoms")
+	assert_eq(AICrew.nautical_distance(11.0), "half a length")
+	assert_eq(AICrew.nautical_distance(30.0), "1 length")
+	assert_eq(AICrew.nautical_distance(80.0), "3 lengths")
 	assert_eq(AICrew.nautical_distance(370.4), "2.0 cables")

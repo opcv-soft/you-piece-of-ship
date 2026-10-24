@@ -9,6 +9,8 @@ extends Sprite3D
 
 ## Opacity of the dark backing behind prompts and HUD text (Developer → Tune → Legibility).
 static var backing_opacity := 0.3
+## Opacity of the station cards ("prompt" bubbles): solid, so they read over the busy deck.
+static var prompt_opacity := 0.85
 
 var text := ""
 var style := "think"
@@ -70,8 +72,9 @@ func show_text(new_text: String, seconds := 2.5, new_style := "think") -> void:
 	# "prompt": what Use does here, light text on a dark see-through backing.
 	_label.add_theme_color_override("font_color", Color(1.0, 0.96, 0.86) if style == "prompt" else Color(0.16, 0.11, 0.09))
 	if style == "prompt":
-		box.bg_color = Color(0.04, 0.06, 0.1, backing_opacity)
-		box.set_border_width_all(0)
+		box.bg_color = Color(0.04, 0.06, 0.1, prompt_opacity)
+		box.border_color = Color(1.0, 0.96, 0.86, 0.9)
+		box.set_border_width_all(3)
 	box.content_margin_left = 22
 	box.content_margin_right = 22
 	box.content_margin_top = 8

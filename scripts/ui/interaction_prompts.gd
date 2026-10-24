@@ -6,7 +6,9 @@ extends Node
 
 const ThoughtBubble = preload("res://scripts/components/thought_bubble.gd")
 
-@export_range(0.0, 1.0) var backing_opacity := 0.3 ## dark backing behind prompts and HUD text
+@export_range(0.0, 1.0) var backing_opacity := 0.3 ## dark backing behind HUD text
+@export_range(0.0, 1.0) var prompt_opacity := 0.85 ## backing of the station cards
+@export_range(20, 60) var prompt_font_size := 38
 
 var _bubbles := {} ## player -> bubble
 var _hud_boxes: Array[StyleBoxFlat] = []
@@ -32,12 +34,23 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	ThoughtBubble.backing_opacity = backing_opacity
+	ThoughtBubble.prompt_opacity = prompt_opacity
+	var shown := {} # target -> the nearest human to it (one card per thing, not one per player)
+	for player in get_tree().get_nodes_in_group("crew"):
+		if player.has_node("AICrew") or not player.is_inside_tree():
+			continue
+		var thing := target_of(player)
+		if thing and (not shown.has(thing) or player.global_position.distance_to(thing.global_position) \
+				< shown[thing].global_position.distance_to(thing.global_position)):
+			shown[thing] = player
 	for box in _hud_boxes:
 		box.bg_color = Color(0.04, 0.06, 0.1, backing_opacity)
 	for player in get_tree().get_nodes_in_group("crew"):
 		if player.has_node("AICrew") or not player.is_inside_tree():
 			continue
 		var target := target_of(player)
+		if target and shown.get(target) != player:
+			target = null # someone nearer already sees this card
 		var bubble: Sprite3D = _bubbles.get(player)
 		if target == null:
 			if bubble:
@@ -46,7 +59,7 @@ func _process(_delta: float) -> void:
 		if bubble == null:
 			bubble = ThoughtBubble.new()
 			bubble.height = 0.0
-			bubble.font_size = 26
+			bubble.font_size = prompt_font_size
 			get_parent().add_child(bubble)
 			_bubbles[player] = bubble
 		bubble.global_position = target.global_position + Vector3(0, 2.3, 0)

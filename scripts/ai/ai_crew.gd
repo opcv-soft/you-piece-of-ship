@@ -21,7 +21,7 @@ var target: Node3D = null ## the thing it is working on (carpenter, cargo)
 var _player: CharacterBody3D
 var _ship: Node3D
 var _brain: Node
-var _intent := "" ## the last plan shown in a thought bubble
+var _intent := "" ## what it's doing right now, in words (shown in the crew panel)
 var _intent_quiet := 0.0
 var _use_cooldown := 0.0
 var _callout_left := 0.0
@@ -60,12 +60,18 @@ func say(text: String, seconds := 2.2) -> void:
 	_intent_quiet = seconds
 
 
-## What I'm about to do, in a thought bubble, shown when the plan changes (not every frame).
-func intend(text: String) -> void:
-	if text == _intent or _intent_quiet > 0.0:
+## What I'm doing now. Routine plans only go to the crew panel; urgent ones ("Too hot! Venting!",
+## "Fire!") also pop a bubble, so the screen isn't full of chatter (Claude's playtest, 2026-10-24).
+func intend(text: String, urgent := false) -> void:
+	if text == _intent:
 		return
 	_intent = text
-	_player.think(text, 2.0, "think")
+	if urgent and _intent_quiet <= 0.0:
+		_player.think(text, 2.0, "think")
+
+
+func activity() -> String:
+	return _intent
 
 
 func _physics_process(delta: float) -> void:

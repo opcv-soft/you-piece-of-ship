@@ -34,7 +34,7 @@ func engineer(delta: float) -> void:
 	var vent_at: float = engine.heat_cap_threshold # above this, top speed is capped: vent
 	if player.station == furnace:
 		if engine.heat > vent_at and engine.vent_ready_in <= 0.0:
-			ai.intend(ai.tr("Too hot! Venting!"))
+			ai.intend(ai.tr("Too hot! Venting!"), true)
 			player.jump_requested = true # vent steam
 		elif engine.heat < 0.6 or engine.vent_ready_in > 0.0 and engine.fuel < 0.7:
 			ai._press_use() # cool enough (or coal needed): let go of the controls
