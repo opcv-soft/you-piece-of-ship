@@ -66,7 +66,7 @@ func test_three_hits_sink_it_and_loot_floats_up() -> void:
 	var loot := get_tree().get_nodes_in_group("loot")
 	assert_eq(loot.size(), 3)
 	loot[0].collect()
-	assert_eq(_level.bonus_points, 60, "loot counts toward the score")
+	assert_eq(_level.bonus_points, 40, "a sunk ship gives planks (2 x 20 points)")
 
 
 func test_an_enemy_ball_on_deck_cracks_the_hull() -> void:

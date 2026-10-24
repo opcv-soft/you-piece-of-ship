@@ -403,6 +403,8 @@ func _show_results() -> void:
 		"progress": clampf(_ship.global_position.x / finish_x, 0.0, 1.0),
 		"score": results.score(delivered, cargo.cargo_value(), water, elapsed, contract.deadline, bonus_points),
 	}
+	var stores := _ship.get_node_or_null("ShipStores")
+	outcome.haul = stores.counts.duplicate() if stores else {}
 	outcome.star_limits = $StarRules.limits()
 	outcome.stars = Stars.count(outcome.score.total, delivered, outcome.star_limits)
 	outcome.earned = Session.record_voyage(Session.contract_index, delivered, outcome.score.total, elapsed, outcome.stars)

@@ -12,6 +12,7 @@ const ShipWake = preload("res://scripts/components/ship_wake.gd")
 const CoalSmears = preload("res://scripts/components/coal_smears.gd")
 const CargoChaos = preload("res://scripts/components/cargo_chaos.gd")
 const EngineSound = preload("res://scripts/components/engine_sound.gd")
+const ShipStores = preload("res://scripts/components/ship_stores.gd")
 ## Fishing spots along the starboard rail, clear of the leak spots and stations.
 const FISHING_SPOTS := [Vector3(5.6, 0.0, 2.75), Vector3(8.3, 0.0, 2.6)]
 const Cannon = preload("res://scripts/components/cannon.gd")
@@ -66,6 +67,7 @@ func _ready() -> void:
 	add_child(CoalSmears.new())
 	add_child(CargoChaos.new())
 	add_child(EngineSound.new())
+	add_child(ShipStores.new())
 	$ShipHandling.impact.connect(func(_rock): lurch(Vector2($ShipHandling.impact_speed, 0.0), false)) # the engine spills coal on impact
 	for i in CANNONS.size():
 		var cannon := Cannon.new()

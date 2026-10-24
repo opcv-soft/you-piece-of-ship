@@ -11,8 +11,10 @@ const Sfx = preload("res://scripts/systems/sfx.gd")
 ## What breaking each kind sounds like.
 const SOUNDS := {"rock": "rock_crack", "wreck": "wood_splinter", "barrel": "barrel_burst", "siren": "siren_shriek",
 		"whale": "whale_moan"}
-## kind -> [health, loot pieces, points each]
-const KINDS := {"rock": [3, 1, 25], "wreck": [4, 3, 60], "siren": [3, 3, 60], "barrel": [1, 1, 40]}
+## kind -> [health, loot pieces, resource, units each]. Rocks are black charcoal rocks; the siren
+## goes straight onto the bowsprit; whales give grease (Olivier, 2026-10-24).
+const KINDS := {"rock": [3, 1, "coal", 2], "wreck": [4, 2, "planks", 2], "siren": [3, 0, "siren", 1],
+		"barrel": [1, 1, "gold", 3], "whale": [5, 1, "grease", 1]}
 
 var health := 1
 var _obstacle: Node3D
@@ -63,9 +65,17 @@ func _burst() -> void:
 	Sfx.play(SOUNDS.get(_obstacle.kind, "rock_crack"), _obstacle.get_parent(), _obstacle.global_position, 2.0)
 	var settings: Array = KINDS[_obstacle.kind]
 	var world := _obstacle.get_parent()
+	if settings[2] == "siren":
+		var ship := _obstacle.get_tree().get_first_node_in_group("player_ship")
+		if ship and ship.has_node("ShipStores"):
+			var points: int = ship.get_node("ShipStores").add("siren", 1)
+			var voyage := _obstacle.get_tree().get_first_node_in_group("voyage")
+			if voyage and "bonus_points" in voyage:
+				voyage.bonus_points += points
 	for i in settings[1]:
 		var loot := LootScene.new()
-		loot.value = settings[2]
+		loot.resource = settings[2]
+		loot.value = settings[3]
 		world.add_child(loot)
 		var spread: float = _obstacle.radius * 0.8
 		loot.global_position = _obstacle.global_position + Vector3(randf_range(-spread, spread), 0.0, randf_range(-spread, spread))

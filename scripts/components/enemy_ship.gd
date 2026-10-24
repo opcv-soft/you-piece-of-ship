@@ -144,7 +144,8 @@ func _sink_now() -> void:
 	UI.play("coin")
 	for i in 3:
 		var loot := LootScene.new()
-		loot.value = 60
+		loot.resource = "planks" # a sunk pirate ship: planks for repairs
+		loot.value = 2
 		get_parent().add_child(loot)
 		loot.global_position = global_position + Vector3(_rng.randf_range(-6, 6), 0, _rng.randf_range(-4, 4))
 

@@ -75,7 +75,9 @@ func _paint() -> void:
 	var look: Array = LOOKS[kind]
 	_model = (load(MODELS + look[0] + ".glb") as PackedScene).instantiate()
 	_model.name = "Model"
-	Toon.paint(_model)
+	# Reef rocks are black charcoal rocks: break one, get charcoal for the furnace (2026-10-24).
+	Toon.paint(_model, {"rock": Color(0.17, 0.16, 0.19), "rock_dark": Color(0.1, 0.1, 0.12), "moss": Color(0.25, 0.3, 0.25)} \
+			if kind == "rock" else {})
 	var s: float = radius / look[1]
 	_model.scale = Vector3(s, s * (1.1 if kind == "cliff" else 1.0), s)
 	_model.rotation.y = fmod(home.x * 1.7 + home.z, TAU)

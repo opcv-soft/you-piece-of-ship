@@ -69,6 +69,14 @@ func _fill() -> void:
 	]
 	if not outcome.delivered:
 		lines.append([tr("Distance"), tr("%d%% of the way") % roundi(outcome.progress * 100.0), false])
+	var haul: Dictionary = outcome.get("haul", {})
+	var parts := PackedStringArray()
+	for resource in ["gold", "coal", "planks", "grease", "siren"]:
+		if haul.get(resource, 0) > 0:
+			parts.append("%d %s" % [haul[resource], tr({"gold": "gold", "coal": "charcoal", "planks": "planks",
+					"grease": "whale grease", "siren": "siren"}[resource])])
+	if not parts.is_empty():
+		lines.append([tr("Haul"), " · ".join(parts), true])
 	if outcome.has("best_score"):
 		lines.append([tr("Best"), tr("%d points, %s") % [outcome.best_score, outcome.best_time_text], true])
 	for line in lines:
