@@ -63,7 +63,7 @@ func test_the_navigator_names_what_it_sees() -> void:
 
 
 
-func test_cannonballs_break_rocks_and_leave_loot_but_whales_never_break() -> void:
+func test_cannonballs_break_rocks_and_whales_and_leave_loot() -> void:
 	var rock: Node3D = _level._spawn_ahead("rock")
 	await wait_physics_frames(1)
 	assert_false(rock.take_hit(), "a rock takes three hits")
@@ -73,8 +73,9 @@ func test_cannonballs_break_rocks_and_leave_loot_but_whales_never_break() -> voi
 	await wait_physics_frames(2)
 	assert_gt(get_tree().get_nodes_in_group("loot").size(), 0, "loot floats where it was")
 	var whale: Node3D = _level._spawn_ahead("whale")
-	for i in 10:
-		assert_false(whale.take_hit(), "whales are dodge-only")
+	for i in 4:
+		assert_false(whale.take_hit(), "a whale takes five hits")
+	assert_true(whale.take_hit(), "then it's whale grease")
 
 
 func test_a_cannonball_bursts_a_barrel() -> void:

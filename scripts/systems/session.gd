@@ -17,6 +17,7 @@ var unlocked := 1 ## how many contracts are open
 var best_scores := {} ## contract index (as text) -> best score
 var best_times := {} ## contract index (as text) -> fastest delivery in seconds
 var stars := {} ## contract index (as text) -> most stars earned (0..3)
+var village := {"gold": 0, "coal": 0, "planks": 0, "grease": 0, "siren": 0} ## everything ever hauled home
 var hats := {} ## player index (as text) -> hat style
 var seen_oceans: Array = [0] ## oceans whose "new ocean" card has been shown
 var unlock_everything := false ## developer mode: every route open
@@ -171,7 +172,7 @@ func save_game() -> void:
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file:
 		file.store_string(JSON.stringify({"money": money, "upgrades": upgrades, "unlocked": unlocked,
-				"best_scores": best_scores, "best_times": best_times, "stars": stars, "hats": hats, "seen_oceans": seen_oceans, "ai_crew": ai_crew, "language": language,
+				"best_scores": best_scores, "best_times": best_times, "stars": stars, "village": village, "hats": hats, "seen_oceans": seen_oceans, "ai_crew": ai_crew, "language": language,
 				"music_volume_db": music_volume_db, "fullscreen": fullscreen, "realistic_sea": realistic_sea,
 				"last_join_address": last_join_address}))
 
@@ -187,6 +188,10 @@ func load_game() -> void:
 		best_scores = data.get("best_scores", {})
 		best_times = data.get("best_times", {})
 		stars = data.get("stars", {})
+		var saved_village = data.get("village", {})
+		if saved_village is Dictionary:
+			for key in saved_village:
+				village[key] = int(saved_village[key])
 		hats = data.get("hats", {})
 		seen_oceans = data.get("seen_oceans", [0])
 		# Saves from before stars: every contract already delivered counts one star.

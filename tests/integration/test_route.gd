@@ -93,6 +93,6 @@ func test_arriving_the_ship_slides_up_the_beach_then_the_results_show() -> void:
 	await wait_physics_frames(3)
 	assert_true(_level._arrival.beaching, "beaching")
 	assert_false(_level.finished, "not over yet: still sliding up the sand")
-	await wait_seconds(_level._arrival.beaching_seconds + 0.3)
+	await wait_seconds(_level._arrival.beaching_seconds + 1.8) # slide up the sand, then the haul goes ashore
 	assert_true(_level.finished)
 	assert_almost_eq(_level.get_node("Ship/ShipHandling").speed, 0.0, 0.2, "settled on the sand")
