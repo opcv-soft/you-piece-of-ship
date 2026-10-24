@@ -18,6 +18,7 @@
 - Secret objectives, many classes, crafting, campaign, permadeath, cosmetics
 
 ## Done
+- 2026-10-24 Blocks D+E (deck chaos): coal spills leave streaky skid-mark smears; crew who walk through get sooty boots and leave fading footprints (coal_smears.gd); the coal shovel is carried big in both arms with a heap that shrinks as it spills; waves and cannonball hits spill coal too. Lashed chests sway in their ropes; hard lurches snap ropes (chests slide with momentum) and burst loose chests open, spilling half their gold as loose piles; gold still counts while aboard, washes overboard from the edges on the next big lurch or while the deck is flooded, and can be carried back into a chest (cargo_chaos.gd). Siren drag fades near her rock and lets go after a bump (ships no longer get pinned).
 - 2026-10-24 Block F: breakable obstacles (scripts/components/breakable.gd): rocks (3 hits), wrecks (4), the siren (3) and new floating barrels (1) break under cannonballs or hard rams (40%+ of top speed) and burst into floating loot; whales, cliffs and atolls never break; barrels sit along every route as cannon targets and just burst if rammed (no bounce, no damage); the siren now drags the whole ship toward her (up to 2.4 m/s) as well as pulling the wheel; wider speech bubbles.
 - 2026-10-24 Block H: realistic FFT ocean (tessarakkt/godot4-oceanfft, MIT; 128x128 FFT, 512 m patch, small LOD tree; ~65 fps on Olivier's MacBook at 5K), tuned brighter for the high camera with whitecaps and glints; the ship rides its real wave heights; storms raise the wind; Settings → "Realistic sea" switches back to the painted sea (automatic where compute shaders aren't available).
 - 2026-10-24 Block C: map table replaced by the crow's nest (rope ladder at the mast; Use climbs in 1.5 s, spyglass in hand; chart and callouts only once up; Use again drops back down); fishing reels the catch up the line and over the rail, and fish stay flopping on deck as items; a crash, big wave or cannonball hit lurches the ship: carried cannonballs are dropped, loose things keep moving, rolling cannonballs bowl sailors over. Reef Run deadline 5:30 → 6:15 (AI crew now delivers).
@@ -56,6 +57,7 @@
 - Phase 1: Committee Summary approved (2026-10-22)
 
 ## Questions for Olivier
+- Fog Bank is now marginal for the AI test crew (the deck chaos costs it time); tune its deadline after you've played it?
 - After the Block B collision change the AI crew finishes Reef Run ~20 s late (348 s vs 330 s deadline) and still sometimes loses The Narrows. Tune the deadline, or the AI's steering margins?
 - Star thresholds for routes and hats are first guesses: too stingy or too generous after a few evenings of play?
 - The Narrows still sometimes beats a crew of 3 AIs plus an idle human (the navigator is needed all the time, so nobody repairs). Fine as the hard one, or ease it?

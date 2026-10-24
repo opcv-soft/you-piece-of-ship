@@ -202,6 +202,8 @@ FR = {
     "on the starboard beam": "par le travers tribord", "on the port beam": "par le travers bâbord",
     "off the starboard quarter": "par tribord arrière", "off the port quarter": "par bâbord arrière",
     "Realistic sea": "Mer réaliste", "CROW'S NEST": "NID-DE-PIE", "Use: climb up": "Utiliser : grimper", "Up the mast!": "En haut du mât !",
+    "A chest burst open: gold all over the deck!": "Un coffre a éclaté : de l'or partout sur le pont !",
+    "%d gold washed overboard": "%d pièces d'or emportées par-dessus bord", "gold": "or",
     "Barrel": "Tonneau", "Spawn: barrel": "Ajouter : tonneau",
     "Rock": "Rocher", "Wreck": "Épave", "Whale": "Baleine", "Atoll": "Atoll", "Coast": "Côte",
     "Show collision shapes": "Voir les formes de collision", "Test Drive: open ocean, no obstacles": "Essai libre : océan ouvert, sans obstacles",

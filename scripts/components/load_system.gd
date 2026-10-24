@@ -42,6 +42,8 @@ func cargo_value() -> int:
 	var total := 0
 	for crate in crates():
 		total += crate.value
+	for gold in get_tree().get_nodes_in_group("gold"):
+		total += gold.value # spilled treasure still aboard still counts
 	return total
 
 

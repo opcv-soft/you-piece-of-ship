@@ -9,6 +9,8 @@ const PixelArt = preload("res://scripts/systems/pixel_art.gd")
 const EngineHeatVisual = preload("res://scripts/components/engine_heat_visual.gd")
 const FishingSpot = preload("res://scripts/components/fishing_spot.gd")
 const ShipWake = preload("res://scripts/components/ship_wake.gd")
+const CoalSmears = preload("res://scripts/components/coal_smears.gd")
+const CargoChaos = preload("res://scripts/components/cargo_chaos.gd")
 ## Fishing spots along the starboard rail, clear of the leak spots and stations.
 const FISHING_SPOTS := [Vector3(5.6, 0.0, 2.75), Vector3(8.3, 0.0, 2.6)]
 const Cannon = preload("res://scripts/components/cannon.gd")
@@ -59,7 +61,9 @@ func _ready() -> void:
 		_paint()
 	$Engine.add_child(EngineHeatVisual.new())
 	add_child(ShipWake.new())
-	$ShipHandling.impact.connect(func(_rock): lurch(Vector2($ShipHandling.impact_speed, 0.0)))
+	add_child(CoalSmears.new())
+	add_child(CargoChaos.new())
+	$ShipHandling.impact.connect(func(_rock): lurch(Vector2($ShipHandling.impact_speed, 0.0), false)) # the engine spills coal on impact
 	for i in CANNONS.size():
 		var cannon := Cannon.new()
 		cannon.name = "Cannon%d" % (i + 1)
@@ -217,30 +221,18 @@ func _on_wave_struck(side: float) -> void:
 
 ## A sudden lurch (crash, cannonball, big wave): anyone carrying a cannonball loses it, and every
 ## loose thing on deck keeps moving (push: ship-local x/z metres per second).
-func lurch(push: Vector2) -> void:
+func lurch(push: Vector2, spill_coal := true) -> void:
 	for player in get_tree().get_nodes_in_group("crew"):
 		if player.carried and player.carried.kind == "ball":
 			player.carried.drop(push * 0.8)
+		elif spill_coal and player.carried and player.carried.kind == "coal":
+			player.carried.spill(clampf(push.length() / 8.0, 0.15, 0.6), push)
 	for item in get_tree().get_nodes_in_group("items"):
 		if is_ancestor_of(item):
 			item.jolt(push)
+	$CargoChaos.on_lurch(push)
 
 
-## A black smudge of spilled coal on the deck (cosmetic; the oldest fade away after a while).
-func add_coal_mark(local: Vector3, size := 1.0) -> void:
-	var mark := MeshInstance3D.new()
-	mark.add_to_group("coal_marks")
-	var quad := PlaneMesh.new()
-	quad.size = Vector2(0.9, 0.7) * clampf(0.6 + size, 0.6, 1.6)
-	var soot := StandardMaterial3D.new()
-	soot.albedo_color = Color(0.05, 0.05, 0.06, 0.75)
-	soot.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	soot.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	quad.material = soot
-	mark.mesh = quad
-	mark.position = Vector3(local.x, 0.015, local.z)
-	mark.rotation.y = randf() * TAU
-	add_child(mark)
-	var marks := get_tree().get_nodes_in_group("coal_marks")
-	if marks.size() > 25:
-		marks[0].queue_free()
+## Spilled coal: a streaky smear on the deck that crew track around (scripts/components/coal_smears.gd).
+func add_coal_mark(local: Vector3, size := 1.0, dir := Vector2.ZERO) -> void:
+	$CoalSmears.add_smear(local, size, dir)

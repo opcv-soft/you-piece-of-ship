@@ -22,6 +22,7 @@ Every script starts with a `##` line saying what it does; `grep -m1 "^##" path` 
   - Sailing and sea: `ship_handling` (speed/steering), `wave_motion` (rocking; rides the FFT sea's heights), `sea` (painted sea; switches to `fft_sea`, the FFT ocean add-on in `addons/tessarakkt.oceanfft/`), `ship_wake`, `shared_camera`.
   - Stations: `station` (base), `helm_station`, `lookout_station` (crow's nest, replaces the map table), `telescope_station` (fog), `map_chart` (the lookout's chart HUD).
   - Things to carry or hit: `item`, `item_dispenser`, `overboard_rail`, `rock` (+ `breakable`: health, loot burst), `loot`, `cannon`, `cannon_projectile`, `enemy_ship`, `fishing_spot`.
+  - Deck chaos: `coal_smears` (spills, sooty footprints), `cargo_chaos` (chests snap loose, burst, gold overboard).
   - Look and feel: `game_feel` (juice), `adaptive_music`, `thought_bubble`, `crew_model`, `crew_sprite`.
 - `scripts/contracts/` — `contract.gd` (one voyage's data), `contract_library.gd` (all hand-made contracts).
 - `scripts/systems/` — autoloads and rules: `session` (state between voyages), `progress`, `stars`, `star_rules`, `upgrades`, `voyage_log`, `hazard_director`, `net` + `net_sync` (online), `toon` (palette), `pixel_art`.
