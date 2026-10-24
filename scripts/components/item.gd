@@ -15,9 +15,16 @@ const KINDS := {
 	"crate": {"size": Vector3(0.8, 0.8, 0.8), "color": Color(0.78, 0.45, 0.2), "carry_speed": 0.6, "name": "cargo crate"},
 	"coal": {"size": Vector3(0.9, 0.15, 0.35), "color": Color(0.12, 0.12, 0.13), "carry_speed": 0.9, "name": "shovel of coal"},
 	"ball": {"size": Vector3(0.4, 0.4, 0.4), "color": Color(0.2, 0.2, 0.24), "carry_speed": 0.7, "name": "cannonball"},
+	"fish": {"size": Vector3(0.7, 0.3, 0.3), "color": Color(0.6, 0.65, 0.7), "carry_speed": 0.9, "name": "fish"},
 }
+## How each kind moves loose on the deck: [static friction, damping]. Cannonballs roll and roll;
+## fish flop about; crates (treasure chests) are heavy.
+const MOTION := {"ball": [0.01, 0.35], "fish": [0.05, 1.6], "crate": [0.09, 1.2]}
+## Things heavy and fast enough to knock a sailor over when they slide into them.
+const KNOCKERS := ["crate", "ball"]
 
-@export_enum("plank", "pin", "crate", "coal", "ball") var kind := "plank"
+@export_enum("plank", "pin", "crate", "coal", "ball", "fish") var kind := "plank"
+@export var species := "fish_sardine" ## fish only: which model
 @export var value := 0 ## score value delivered to port (cargo crates)
 @export var static_friction := 0.09 ## deck tilt (as gravity fraction) needed before it starts sliding
 @export var slide_damping := 1.2
@@ -49,14 +56,19 @@ func _ready() -> void:
 	add_to_group("interactables")
 	if kind == "crate":
 		add_to_group("cargo")
+	if MOTION.has(kind):
+		static_friction = MOTION[kind][0]
+		slide_damping = MOTION[kind][1]
 	ship = _find_ship()
 	if ship and "art_style" in ship and ship.art_style == "painted":
 		# Painted props: a treasure chest, a plank, the rudder pin, a shovel of coal.
 		var model: Node3D = ship.prop({"crate": "chest", "plank": "plank", "pin": "pin", "coal": "shovel",
-				"ball": "cannonball"}[kind], "Mesh")
+				"ball": "cannonball", "fish": species}[kind], "Mesh")
+		if kind == "fish":
+			model.scale = Vector3.ONE * 1.4
 		add_child(model)
 		return
-	if ship and "pixel_art" in ship and ship.pixel_art and kind != "ball":
+	if ship and "pixel_art" in ship and ship.pixel_art and not kind in ["ball", "fish"]:
 		# Pixel-art sprite: a crate, a plank or the iron pin (sizes match the grey boxes).
 		var sizes := {"crate": 0.06, "plank": 0.06, "pin": 0.045, "coal": 0.05}
 		var sprite := PixelArt.make_sprite(PixelArt.texture("shovel_coal" if kind == "coal" else kind), sizes[kind])
@@ -201,7 +213,38 @@ func slide(delta: float) -> void:
 		next.y = clampf(next.y, -limit_z, limit_z)
 		velocity.y = 0.0
 	position = Vector3(next.x, 0.0, next.y)
-	if kind == "crate" and velocity.length() > knock_speed:
+	if KNOCKERS.has(kind) and velocity.length() > knock_speed:
 		for player in get_tree().get_nodes_in_group("crew"):
 			if distance_to_player(player) < 0.75:
 				player.knock_down(velocity.normalized())
+	_animate_loose(delta)
+
+
+## A sudden lurch of the ship (a crash, a wave, a cannonball): loose things keep going.
+## push is in ship-local x/z metres per second.
+func jolt(push: Vector2) -> void:
+	if carrier or lashed:
+		return
+	velocity += push * (1.4 if kind == "ball" else 1.0)
+
+
+var _flop := 0.0
+
+
+## Cannonballs roll as they slide; fish flop about now and then.
+func _animate_loose(delta: float) -> void:
+	var mesh := get_node_or_null("Mesh") as Node3D
+	if mesh == null:
+		return
+	if kind == "ball":
+		mesh.rotation.z -= velocity.x * delta / 0.2
+		mesh.rotation.x += velocity.y * delta / 0.2
+	elif kind == "fish":
+		_flop -= delta
+		if _flop <= 0.0:
+			_flop = randf_range(0.6, 1.8)
+			velocity += Vector2(randf_range(-1.2, 1.2), randf_range(-1.2, 1.2))
+			var hop := create_tween()
+			hop.tween_property(mesh, "position:y", 0.35, 0.12)
+			hop.parallel().tween_property(mesh, "rotation:z", randf_range(-0.8, 0.8), 0.12)
+			hop.tween_property(mesh, "position:y", 0.0, 0.15)

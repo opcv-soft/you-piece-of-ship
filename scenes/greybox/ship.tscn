@@ -17,6 +17,7 @@
 [ext_resource type="Script" path="res://scripts/components/overboard_rail.gd" id="15_rail"]
 [ext_resource type="Script" path="res://scripts/components/telescope_station.gd" id="16_telescope"]
 [ext_resource type="Script" path="res://scripts/components/coal_pile.gd" id="17_coal"]
+[ext_resource type="Script" path="res://scripts/components/lookout_station.gd" id="18_lookout"]
 
 [sub_resource type="StandardMaterial3D" id="mat_hull"]
 albedo_color = Color(0.42, 0.31, 0.23, 1)
@@ -271,33 +272,9 @@ text = "HELM"
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.5, 0.5, 0)
 shape = SubResource("shape_post")
 
-[node name="MapTable" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.2, 0, -2.1)
-script = ExtResource("4_station")
-station_name = "MAP TABLE"
-radius = 1.2
-needs_use = false
-prompt = "Stand here to read the chart"
-
-[node name="TableMesh" type="MeshInstance3D" parent="MapTable"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, -0.85)
-mesh = SubResource("mesh_table")
-
-[node name="ChartTop" type="MeshInstance3D" parent="MapTable"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.91, -0.85)
-mesh = SubResource("mesh_chart_top")
-
-[node name="Label" type="Label3D" parent="MapTable"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, -0.85)
-billboard = 1
-no_depth_test = true
-font_size = 56
-outline_size = 12
-text = "MAP TABLE"
-
-[node name="MapTableBody" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.2, 0.45, -2.95)
-shape = SubResource("shape_table")
+[node name="Lookout" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -0.9)
+script = ExtResource("18_lookout")
 
 [node name="Items" type="Node3D" parent="."]
 

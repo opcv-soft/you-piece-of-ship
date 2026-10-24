@@ -7,7 +7,7 @@ const RockScene = preload("res://scenes/greybox/rock.tscn")
 var _level: Node3D
 var _ship: Node3D
 var _helm: Node3D
-var _map_table: Node3D
+var _lookout: Node3D
 var _chart: Control
 var _crew: Array[Node] = []
 var _rock: Node3D
@@ -18,7 +18,7 @@ func before_each() -> void:
 	add_child_autofree(_level)
 	_ship = _level.get_node("Ship")
 	_helm = _ship.get_node("Helm")
-	_map_table = _ship.get_node("MapTable")
+	_lookout = _ship.get_node("Lookout")
 	_chart = _level.get_node("HUD/MapChart")
 	_crew = _level.get_tree().get_nodes_in_group("crew")
 	for player in _crew:
@@ -41,12 +41,21 @@ func test_given_hidden_rock_when_player_at_helm_then_rock_not_drawn() -> void:
 	await wait_physics_frames(3)
 	assert_eq(_helm.occupant, _crew[0], "P1 took the helm")
 	assert_false(_rock.get_node("Mesh").is_visible_in_tree(), "rock is not drawn in the 3D view")
-	assert_false(_chart.visible, "nobody is at the map table, so no chart")
+	assert_false(_chart.visible, "nobody is in the crow's nest, so no chart")
 
 
-func test_given_hidden_rock_when_player_at_map_table_then_chart_shows_it() -> void:
-	await _walk_to(_crew[2], _map_table)
-	assert_true(_chart.visible, "chart shown while someone stands at the map table")
+func _climb(player: Node3D) -> void:
+	await _walk_to(player, _lookout)
+	assert_true(player.interact_with(_lookout), "Use at the ladder")
+	assert_false(_chart.visible, "still climbing: nothing seen yet")
+	await wait_seconds(1.7)
+
+
+func test_given_hidden_rock_when_player_in_crows_nest_then_chart_shows_it() -> void:
+	await _climb(_crew[2])
+	assert_true(_lookout.is_up(), "up the mast in 1.5 s")
+	assert_gt(_crew[2].global_position.y - _ship.global_position.y, 6.0, "really up there")
+	assert_true(_chart.visible, "chart shown while someone is in the crow's nest")
 	var mark: Vector2 = _chart.chart_point(_rock.global_position)
 	var expected := Vector2(0, -60.0 * _chart.chart_scale())
 	assert_almost_eq(mark.x, expected.x, 4.0, "rock is straight ahead on the chart")
@@ -54,12 +63,13 @@ func test_given_hidden_rock_when_player_at_map_table_then_chart_shows_it() -> vo
 	assert_true(_chart.rock_marks().size() >= 1, "rock is drawn on the chart")
 
 
-func test_given_player_reading_chart_when_walking_away_then_chart_hidden() -> void:
-	await _walk_to(_crew[2], _map_table)
+func test_given_lookout_when_climbing_down_then_chart_hidden() -> void:
+	await _climb(_crew[2])
 	assert_true(_chart.visible)
-	_crew[2].global_position = _ship.to_global(Vector3(-3, 0.1, 1.5))
-	await wait_physics_frames(5)
+	_crew[2].use_requested = true
+	await wait_seconds(1.5)
 	assert_false(_chart.visible)
+	assert_lt(_crew[2].global_position.y - _ship.global_position.y, 1.0, "back down on the deck")
 
 
 func test_given_player_at_helm_when_pushing_up_and_left_then_ship_speeds_up_and_turns_port() -> void:

@@ -5,7 +5,7 @@ extends Node
 ## With neither needed, it goes wherever help is most urgent.
 
 const JOBS := ["helm", "navigator", "engine", "pump", "carpenter", "cargo", "gunner"]
-const STATION_FOR := {"helm": "Helm", "navigator": "MapTable", "engine": "Engine", "pump": "Pump"}
+const STATION_FOR := {"helm": "Helm", "navigator": "Lookout", "engine": "Engine", "pump": "Pump"}
 const LABELS := {"helm": "Helm", "navigator": "Navigator", "engine": "Engine", "pump": "Pump",
 		"carpenter": "Carpenter", "cargo": "Cargo", "gunner": "Gunner"}
 

@@ -67,3 +67,22 @@ func test_an_idle_ai_goes_fishing_when_all_is_calm_and_stops_for_a_leak() -> voi
 	_ship.get_node("HullSystem").add_breach(Vector3(-1.8, 0, 2.3))
 	await wait_seconds(1.0)
 	assert_false(_crew[3].station != null and _crew[3].station.is_in_group("fishing_spots"), "reels in for the leak")
+
+
+func test_the_catch_is_reeled_onto_the_deck_and_stays_there() -> void:
+	var spot: Node3D = _ship.get_node("FishingSpot1")
+	var fisher: Node3D = _crew[1]
+	fisher.position = spot.position
+	await wait_physics_frames(2)
+	spot.occupy(fisher)
+	spot.roll_catch() # warm the dice
+	spot.phase = spot.Phase.BITE
+	spot.bite_left = 1.0
+	spot._rng.seed = 1 # a sardine, not the rare treasure
+	spot.strike(fisher)
+	assert_eq(spot.phase, spot.Phase.REELING, "reeling it in")
+	await wait_seconds(spot.reel_seconds + 0.3)
+	var fish := get_tree().get_nodes_in_group("items").filter(func(i): return i.kind == "fish")
+	assert_eq(fish.size(), 1, "the fish is on the deck")
+	assert_true(_ship.is_ancestor_of(fish[0]))
+	assert_eq(spot.phase, spot.Phase.WAITING, "and the line is cast again")
