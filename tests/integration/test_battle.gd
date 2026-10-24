@@ -127,3 +127,32 @@ func test_a_hit_knocks_a_carried_cannonball_loose_and_it_rolls_into_crew() -> vo
 	assert_gt(ball.velocity.x, 3.0, "and rolls forward")
 	await wait_seconds(1.0)
 	assert_gt(victim.knocked, 0.0, "it bowls a sailor over")
+
+
+func test_pirates_have_a_crew_and_keep_pace() -> void:
+	var enemy: Node3D = _level.spawn_enemy(1.0)
+	await wait_physics_frames(2)
+	assert_eq(enemy._crew.size(), enemy.crew_count, "little pirates aboard")
+	var handling := _ship.get_node("ShipHandling")
+	handling.speed = handling.max_speed * 0.7
+	enemy.global_position = _ship.global_position + _ship.global_basis.z * enemy.stand_off
+	enemy.global_position.y = 0.0
+	enemy._speed = handling.speed
+	await wait_seconds(2.0)
+	var along: float = (enemy.global_position - _ship.global_position).dot(_ship.global_basis.x)
+	assert_lt(absf(along), 8.0, "still level with us after 2 s")
+
+
+func test_ramming_a_pirate_hurts_both() -> void:
+	var enemy: Node3D = _level.spawn_enemy(1.0)
+	enemy.set_physics_process(true)
+	enemy.global_position = _ship.global_position + _ship.global_basis.z * 4.5
+	enemy.global_position.y = 0.0
+	var health: int = enemy.health
+	await wait_physics_frames(3)
+	assert_lt(enemy.health, health, "the pirate ship is damaged")
+	var cracked := 0
+	for breach in _ship.get_node("HullSystem").breaches():
+		if breach.state != 0:
+			cracked += 1
+	assert_gt(cracked, 0, "and so are we")

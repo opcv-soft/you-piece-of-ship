@@ -5,6 +5,7 @@ extends Node3D
 signal landed(at: Vector3, hit: Node3D)
 
 const Toon = preload("res://scripts/systems/toon.gd")
+const HitFX = preload("res://scripts/components/hit_fx.gd")
 
 var shooter: Node3D ## who fired: never hits itself
 var start := Vector3.ZERO
@@ -32,8 +33,46 @@ func _physics_process(delta: float) -> void:
 	var t := clampf(_age / seconds, 0.0, 1.0)
 	var flat := start.lerp(target, t)
 	global_position = flat + Vector3(0, sin(t * PI) * 5.0 * (1.0 - t * 0.3), 0)
+	# No height in this game's aiming (Olivier, 2026-10-24): the ball hits anything it passes over.
+	var struck := _struck_at(flat)
+	if struck:
+		target = Vector3(flat.x, 0.0, flat.z)
+		_hit(struck)
+		return
 	if t >= 1.0:
 		_land()
+
+
+## Whatever is under the ball's path right now (obstacles that can be hit, pirate ships), or null.
+func _struck_at(point: Vector3) -> Node3D:
+	if _age < 0.12:
+		return null # clear of our own rail first
+	for enemy in get_tree().get_nodes_in_group("enemy_ships"):
+		if enemy != shooter and enemy.has_method("contains") and enemy.contains(point):
+			return enemy
+	for obstacle in get_tree().get_nodes_in_group("rocks"):
+		if obstacle.has_method("take_hit") and obstacle.has_node("Breakable"):
+			var gap := Vector2(obstacle.global_position.x - point.x, obstacle.global_position.z - point.z).length()
+			if gap < obstacle.radius + 0.6:
+				return obstacle
+	var ship := get_tree().get_first_node_in_group("player_ship") as Node3D
+	if ship and ship != shooter and shooter and shooter.is_in_group("enemy_ships") and _on_ship(ship, point):
+		return ship
+	return null
+
+
+func _hit(struck: Node3D) -> void:
+	var at := Vector3(global_position.x, 0.0, global_position.z)
+	HitFX.play(at, get_parent(), struck)
+	var ship := get_tree().get_first_node_in_group("player_ship") as Node3D
+	if struck == ship:
+		var voyage := get_tree().get_first_node_in_group("voyage")
+		if voyage and voyage.has_method("cannon_hit"):
+			voyage.cannon_hit(at)
+	elif struck.has_method("take_hit"):
+		struck.take_hit(at)
+	landed.emit(target, struck)
+	queue_free()
 
 
 func _land() -> void:
