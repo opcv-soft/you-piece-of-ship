@@ -182,3 +182,8 @@ Decision: KEPT / REVERTED — why
 - Smashed things should break into pieces that float, then get swooshed into the right pile on the boat.
 - "The waves do not appear AT ALL. You can remove the whole wave mechanic for now" → big waves off behind a flag.
 - Fishing succeeds too often → rarer, more random, dev sliders.
+
+## 2026-10-24 late — Olivier
+- "i only get the loot when i hit the floating barrels, i want to get the loot when i hit everything" → every hit chips salvage aboard.
+- "i want a aim thing that shows me where the cannon trajectory is" → aim guide.
+- "It's hard to read, hard to understand what the other AI are doing" → Claude playtested Maiden Voyage and Reef Run; review sent, top-5 readability changes awaiting Olivier's pick.

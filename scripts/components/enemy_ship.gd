@@ -105,7 +105,7 @@ func contains(point: Vector3) -> bool:
 	return absf(local.x - 1.2) < 9.5 * model_scale + 1.0 and absf(local.z) < 3.8 * model_scale + 1.0
 
 
-func take_hit(_point: Vector3) -> void:
+func take_hit(point: Vector3) -> void:
 	if not alive:
 		return
 	health -= 1
@@ -114,6 +114,13 @@ func take_hit(_point: Vector3) -> void:
 	_crew_fall()
 	if health <= 0:
 		_sink_now()
+	else:
+		var chip := Salvage.new() # every hit knocks a plank loose, and it flies aboard
+		chip.resource = "planks"
+		chip.units = 1
+		chip.pieces = 2
+		get_parent().add_child(chip)
+		chip.global_position = point * Vector3(1, 0, 1) if point != Vector3.ZERO else global_position * Vector3(1, 0, 1)
 
 
 ## The pirates fall over, then scramble back up.

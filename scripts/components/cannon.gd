@@ -6,6 +6,7 @@ extends "res://scripts/components/station.gd"
 signal fired(ball: Node3D)
 
 const Projectile = preload("res://scripts/components/cannon_projectile.gd")
+const AimGuide = preload("res://scripts/components/cannon_aim_guide.gd")
 
 @export var side := 1.0 ## +1 starboard, -1 port
 @export var aim_limit_degrees := 35.0
@@ -59,6 +60,7 @@ func _ready() -> void:
 	_base.rotation.y = 0.0 if side > 0.0 else PI # model points +z (starboard)
 	_base.position.z = side * 0.25
 	add_child(_base)
+	add_child(AimGuide.new())
 
 
 func accepts_item(item: Node3D, _player: Node3D) -> bool:

@@ -21,7 +21,7 @@ Every script starts with a `##` line saying what it does; `grep -m1 "^##" path` 
   - Ship systems: `hull_system` + `breach` (leaks), `engine_system` + `engine_station` + `coal_pile` + `engine_gauge` + `engine_heat_visual`, `rudder_system`, `load_system` + `cargo_bay`, `repair_station` (cooling pipe).
   - Sailing and sea: `ship_handling` (speed/steering), `wave_motion` (rocking; rides the FFT sea's heights), `sea` (painted sea; switches to `fft_sea`, the FFT ocean add-on in `addons/tessarakkt.oceanfft/`), `ship_wake`, `water_streaks` (speed streaks), `shared_camera`.
   - Stations: `station` (base), `helm_station`, `lookout_station` (crow's nest, replaces the map table), `telescope_station` (fog), `map_chart` (the lookout's chart HUD).
-  - Things to carry or hit: `item`, `item_dispenser`, `overboard_rail`, `rock` (+ `breakable`: health, burst into `salvage`: pieces that bob then swoosh into their pile aboard), `loot`, `cannon`, `cannon_projectile` (+ `hit_fx`), `enemy_ship`, `fishing_spot`.
+  - Things to carry or hit: `item`, `item_dispenser`, `overboard_rail`, `rock` (+ `breakable`: health, burst into `salvage`: pieces that bob then swoosh into their pile aboard), `loot`, `cannon` (+ `cannon_aim_guide`), `cannon_projectile` (+ `hit_fx`), `enemy_ship`, `fishing_spot`.
   - Hauling: `ship_stores` (gold bucket, charcoal, planks, grease, skewered sirens).
   - Deck chaos: `coal_smears` (spills, sooty footprints), `cargo_chaos` (chests snap loose, burst, gold overboard).
   - Look and feel: `game_feel` (juice), `engine_sound`, `adaptive_music`, `thought_bubble`, `crew_model`, `crew_sprite`.
