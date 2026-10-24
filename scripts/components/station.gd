@@ -13,6 +13,7 @@ extends Node3D
 var occupants: Array[Node3D] = []
 var status_text := "" ## live state for the label, set by the system that owns this station
 var enabled := true ## a disabled station can't be used and hides its label
+static var show_labels := false ## true: the old permanent labels on every station
 
 ## The first player operating this station, or null.
 var occupant: Node3D:
@@ -33,7 +34,9 @@ func _update_label() -> void:
 	var label := get_node_or_null("Label") as Label3D
 	if label == null:
 		return
-	label.visible = enabled and _label_wanted()
+	# Contextual prompts (Olivier, 2026-10-24): the label only shows for an alert ("OVERHEAT!",
+	# "Cracking! 5"); otherwise each player sees a prompt for what they're next to (interaction_prompts.gd).
+	label.visible = enabled and _label_wanted() and (show_labels or status_text.contains("!"))
 	var lines := PackedStringArray([tr(station_name)])
 	if status_text != "":
 		lines.append(status_text)
@@ -45,6 +48,18 @@ func _update_label() -> void:
 ## Override: hide the label when it would only be clutter.
 func _label_wanted() -> bool:
 	return true
+
+
+## One prompt for a player standing here: name, state, and what Use does.
+func prompt_text(player: Node3D) -> String:
+	var lines := PackedStringArray([tr(station_name)])
+	if status_text != "":
+		lines.append(status_text)
+	if occupants.has(player):
+		lines.append(tr("Use: let go"))
+	elif prompt != "":
+		lines.append(tr(prompt))
+	return "\n".join(lines)
 
 
 func _show_prompt() -> bool:

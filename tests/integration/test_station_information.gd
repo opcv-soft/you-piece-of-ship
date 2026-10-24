@@ -93,3 +93,22 @@ func test_given_player_at_helm_when_using_again_then_leaves_helm() -> void:
 	await wait_physics_frames(2)
 	assert_null(_helm.occupant)
 	assert_null(_crew[0].station)
+
+
+func test_contextual_prompt_shows_only_for_what_a_player_is_near() -> void:
+	var prompts := _level.get_node("InteractionPrompts")
+	var helm_label := _helm.get_node("Label") as Label3D
+	await wait_physics_frames(2)
+	assert_false(helm_label.visible, "no permanent label on the helm")
+	await _walk_to(_crew[0], _helm)
+	assert_eq(prompts.target_of(_crew[0]), _helm, "P1 is at the helm")
+	assert_string_contains(prompts.text_for(_helm, _crew[0]), "steer", "the prompt says what Use does")
+
+
+func test_a_sailor_working_a_station_fades() -> void:
+	await _walk_to(_crew[0], _helm)
+	_crew[0].use_requested = true
+	await wait_physics_frames(3)
+	var sailor := _crew[0].get_node_or_null("Visual/Sailor")
+	if sailor:
+		assert_true(sailor._faded, "see-through while steering")

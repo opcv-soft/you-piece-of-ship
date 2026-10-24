@@ -12,7 +12,7 @@ const PALETTE := {
 	"wood_hull": [Color(0.62, 0.36, 0.22), 0.0, true, 0.15],
 	"wood_light": [Color(0.93, 0.72, 0.47), 0.0, true, 0.15],
 	"wood_dark": [Color(0.4, 0.23, 0.14), 0.0, true, 0.15],
-	"deck": [Color(0.95, 0.79, 0.56), 0.0, false, 0.05],
+	"deck": [Color("B8895B"), 0.0, false, 0.05], # darker deck (Olivier, 2026-10-24)
 	"paint_red": [Color(0.94, 0.38, 0.36), 0.0, true, 0.4],
 	"paint_teal": [Color(0.28, 0.72, 0.74), 0.0, true, 0.4],
 	"trim_cream": [Color(1.0, 0.95, 0.82), 0.0, true, 0.3],
@@ -67,6 +67,23 @@ static func material(name: String, tint := Color(-1, 0, 0)) -> ShaderMaterial:
 		mat.next_pass = outline
 	_cache[key] = mat
 	return mat
+
+
+## A see-through copy of a painted material (a sailor working a station fades so you can see
+## what they're working on).
+static func see_through(source: Material, alpha := 0.35) -> Material:
+	if not source is ShaderMaterial:
+		return source
+	var key := "see_through_%d_%.2f" % [source.get_instance_id(), alpha]
+	if _cache.has(key):
+		return _cache[key]
+	var faded := (source as ShaderMaterial).duplicate() as ShaderMaterial
+	faded.shader = TOON_SEE_THROUGH
+	faded.set_shader_parameter("alpha", alpha)
+	faded.next_pass = null
+	faded.render_priority = 3
+	_cache[key] = faded
+	return faded
 
 
 ## Paints every mesh under a node by its surface material names. A name prefix up to the first

@@ -13,6 +13,8 @@ const VoyageSky = preload("res://scripts/levels/voyage/voyage_sky.gd")
 const VoyageRoute = preload("res://scripts/levels/voyage/voyage_route.gd")
 const VoyagePirates = preload("res://scripts/levels/voyage/voyage_pirates.gd")
 const VoyageArrival = preload("res://scripts/levels/voyage/voyage_arrival.gd")
+const InteractionPrompts = preload("res://scripts/ui/interaction_prompts.gd")
+const VoyageCountdown = preload("res://scripts/levels/voyage/voyage_countdown.gd")
 const Upgrades = preload("res://scripts/systems/upgrades.gd")
 const AICrew = preload("res://scripts/ai/ai_crew.gd")
 const PlayerControls = preload("res://scripts/systems/player_controls.gd")
@@ -45,6 +47,7 @@ var _sky := VoyageSky.new(self) ## sky, fog, storm
 var _route := VoyageRoute.new(self) ## rocks, cliffs, port
 var _pirates := VoyagePirates.new(self)
 var _arrival := VoyageArrival.new(self) ## the pirate village and beaching the ship
+var _countdown := VoyageCountdown.new(self) ## 5 s to get to your posts
 
 @onready var _ship: Node3D = $Ship
 @onready var _handling: Node = $Ship/ShipHandling
@@ -96,6 +99,7 @@ func _ready() -> void:
 	results.sail_again_pressed.connect(_sail_again)
 	results.map_pressed.connect(_back_to_map)
 	results.change_crew_pressed.connect(_change_crew)
+	add_child(InteractionPrompts.new())
 	var pause := PauseMenu.new()
 	pause.name = "PauseMenu"
 	pause.voyage = self
@@ -119,6 +123,15 @@ func _ready() -> void:
 
 
 func _start() -> void:
+	$HUD/CrewJoin.visible = false
+	# A real run (not a test) begins with 5 s to get to your posts, the ship held still.
+	if is_inside_tree() and get_tree().current_scene == self and Net.role != "client" and not _countdown.running():
+		_countdown.start()
+		return
+	_set_sail()
+
+
+func _set_sail() -> void:
 	started = true
 	# The sail keeps the ship moving even if the engine dies (not on a smuggler's sail-less ship).
 	_handling.sail_speed = 0.0 if contract.equipment.has("no_sail") else 1.2
@@ -167,6 +180,10 @@ func add_ai(index: int, primary: String, secondary := "") -> Node:
 
 
 func _physics_process(delta: float) -> void:
+	if _countdown.running():
+		_handling.throttle = 0.0
+		if _countdown.step(delta):
+			_set_sail()
 	if _crash_flash > 0.0:
 		_crash_flash -= delta
 		_banner.visible = _crash_flash > 0.0

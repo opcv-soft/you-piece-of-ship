@@ -26,6 +26,7 @@ func _process(_delta: float) -> void:
 			near = near or distance_to_player(player) <= radius
 		var count := " %d" % stock if stock < 100 else "" # the cannonball rack never runs out: no count
 		label.text = tr(title) + count + ("\n" + tr("Use: take one") if near and stock > 0 else "")
+		label.visible = false # contextual prompts instead (interaction_prompts.gd)
 
 
 func distance_to_player(player: Node3D) -> float:

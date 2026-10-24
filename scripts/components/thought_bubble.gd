@@ -7,6 +7,9 @@ extends Sprite3D
 @export var height := 3.3 ## metres above the feet
 @export var font_size := 30
 
+## Opacity of the dark backing behind prompts and HUD text (Developer → Tune → Legibility).
+static var backing_opacity := 0.75
+
 var text := ""
 var style := "think"
 var _left := 0.0
@@ -29,7 +32,7 @@ func _ready() -> void:
 	visible = false
 	_viewport = SubViewport.new()
 	_viewport.transparent_bg = true
-	_viewport.size = Vector2i(700, 150)
+	_viewport.size = Vector2i(700, 190)
 	_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
 	add_child(_viewport)
 	_panel = PanelContainer.new()
@@ -64,17 +67,22 @@ func show_text(new_text: String, seconds := 2.5, new_style := "think") -> void:
 	box.border_color = Color(0.16, 0.11, 0.09)
 	box.set_border_width_all(4)
 	box.set_corner_radius_all(30 if style == "think" else 16)
+	# "prompt": what Use does here, light text on a dark see-through backing.
+	_label.add_theme_color_override("font_color", Color(1.0, 0.96, 0.86) if style == "prompt" else Color(0.16, 0.11, 0.09))
+	if style == "prompt":
+		box.bg_color = Color(0.04, 0.06, 0.1, backing_opacity)
+		box.set_border_width_all(0)
 	box.content_margin_left = 22
 	box.content_margin_right = 22
 	box.content_margin_top = 8
 	box.content_margin_bottom = 10
 	_panel.add_theme_stylebox_override("panel", box)
 	# Fit the bubble to the text, centred, with room for the tail below.
-	var text_size := _label.get_theme_font("font").get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size)
+	var text_size := _label.get_theme_font("font").get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size)
 	var panel_size := Vector2(minf(text_size.x + 52.0, 690.0), text_size.y + 22.0)
 	_panel.size = panel_size
 	_panel.position = Vector2((700.0 - panel_size.x) * 0.5, 6.0)
-	_tail.size = Vector2(700, 150)
+	_tail.size = Vector2(700, 190)
 	_tail.queue_redraw()
 	_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
 	visible = true
@@ -98,6 +106,8 @@ func _process(delta: float) -> void:
 
 
 func _draw_tail() -> void:
+	if style == "prompt":
+		return
 	var ink := Color(0.16, 0.11, 0.09)
 	var fill := Color(1.0, 0.86, 0.3) if style == "shout" else Color(1, 1, 1)
 	var bottom := _panel.position.y + _panel.size.y
