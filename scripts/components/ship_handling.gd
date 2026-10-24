@@ -193,6 +193,6 @@ func _hit(rock: Node3D) -> void:
 	rock.reveal()
 	impact.emit(rock)
 	rock_hit.emit(rock)
-	# A hard ram chips at breakable things too (hard enough: 40% of top speed or more).
-	if impact_strength() >= 0.4 and rock.has_method("take_hit"):
-		rock.take_hit(rock.global_position, 1 + int(impact_strength() * 1.5))
+	# A hard ram (40% of top speed or more) damages breakable things; any bump knocks a bit of salvage off.
+	if rock.has_method("take_hit"):
+		rock.take_hit(rock.global_position, 1 + int(impact_strength() * 1.5) if impact_strength() >= 0.4 else 0)

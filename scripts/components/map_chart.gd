@@ -71,7 +71,7 @@ func _draw() -> void:
 	var names := PackedStringArray()
 	for reader in station.readers():
 		names.append("P%d" % reader.player_index)
-	draw_string(ThemeDB.fallback_font, Vector2(0, -8), tr("MAP TABLE  read by ") + ", ".join(names),
+	draw_string(ThemeDB.fallback_font, Vector2(0, -8), tr("CHART  read by ") + ", ".join(names),
 			HORIZONTAL_ALIGNMENT_CENTER, size.x, 18, Color(1, 1, 1))
 
 

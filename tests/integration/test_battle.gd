@@ -64,9 +64,10 @@ func test_three_hits_sink_it_and_its_planks_swoosh_aboard() -> void:
 	assert_false(enemy.is_threat())
 	await wait_physics_frames(2)
 	var salvage := get_tree().get_nodes_in_group("salvage")
-	assert_eq(salvage.size(), 1)
-	salvage[0].land_all()
-	assert_eq(_level.bonus_points, 120, "a sunk ship gives planks (6 x 20 points)")
+	assert_eq(salvage.size(), 3, "a plank off each of the first two hits, the rest when it sinks")
+	for piece in salvage:
+		piece.land_all()
+	assert_eq(_level.bonus_points, 160, "planks: 1 + 1 + 6, at 20 points each")
 
 
 func test_an_enemy_ball_on_deck_cracks_the_hull() -> void:
@@ -156,3 +157,27 @@ func test_ramming_a_pirate_hurts_both() -> void:
 		if breach.state != 0:
 			cracked += 1
 	assert_gt(cracked, 0, "and so are we")
+
+
+func test_a_player_at_a_cannon_sees_the_aim_guide_and_it_turns_gold_on_target() -> void:
+	var cannon: Node3D = _cannons(1.0)[0]
+	var guide: Node3D = cannon.get_node("AimGuide")
+	await wait_physics_frames(2)
+	assert_false(guide.visible, "hidden when nobody's at the cannon")
+	cannon.occupy(_crew[0])
+	await wait_physics_frames(2)
+	assert_true(guide.visible, "dotted line to where the ball lands")
+	assert_null(guide.on_target, "open sea")
+	var enemy: Node3D = _level.spawn_enemy(1.0)
+	enemy.set_physics_process(false)
+	enemy.global_position = cannon.landing_point()
+	enemy.global_position.y = 0.0
+	await wait_physics_frames(2)
+	assert_eq(guide.on_target, enemy, "gold when the shot would hit them")
+
+
+func test_every_hit_on_a_pirate_knocks_a_plank_aboard() -> void:
+	var enemy: Node3D = _level.spawn_enemy(-1.0)
+	enemy.take_hit(enemy.global_position)
+	await wait_physics_frames(2)
+	assert_eq(get_tree().get_nodes_in_group("salvage").size(), 1, "a plank flies off on the first hit")

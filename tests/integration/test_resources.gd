@@ -2,6 +2,7 @@ extends GutTest
 ## features/resources.feature — what you break becomes gold, charcoal, planks, grease or a skewered siren.
 
 const LevelScene = preload("res://scenes/levels/voyage.tscn")
+const Projectile = preload("res://scripts/components/cannon_projectile.gd")
 
 var _level: Node3D
 var _ship: Node3D
@@ -62,7 +63,7 @@ func test_the_siren_ends_up_on_the_bowsprit_and_whales_give_grease() -> void:
 	for i in 5:
 		whale.take_hit()
 	await _collect_all()
-	assert_eq(_stores.counts.grease, 1)
+	assert_eq(_stores.counts.grease, 5, "a keg knocked off with every hit, and one when it breaks")
 
 
 func test_debris_floats_then_swooshes_into_its_pile_by_itself() -> void:
@@ -72,6 +73,29 @@ func test_debris_floats_then_swooshes_into_its_pile_by_itself() -> void:
 	await wait_seconds(3.0)
 	assert_gt(_stores.counts.gold, 0, "then they fly into the bucket")
 	assert_eq(get_tree().get_nodes_in_group("salvage").size(), 0)
+
+
+func test_every_cannonball_hit_knocks_charcoal_aboard() -> void:
+	var rock: Node3D = _level._spawn_ahead("rock")
+	await wait_physics_frames(1)
+	var ball := Projectile.new()
+	_level.add_child(ball)
+	ball.shooter = _ship
+	ball.launch(_ship.global_position + Vector3(0, 1, 0), rock.global_position, 0.5)
+	await wait_seconds(0.8)
+	assert_true(rock.is_in_group("rocks"), "one hit doesn't break it")
+	await _collect_all()
+	assert_gt(_stores.counts.coal, 0, "but a lump of charcoal still comes aboard")
+
+
+func test_even_a_gentle_bump_knocks_charcoal_aboard() -> void:
+	var rock: Node3D = _level._spawn_ahead("rock")
+	var handling: Node = _ship.get_node("ShipHandling")
+	handling.speed = handling.max_speed * 0.15
+	handling._hit(rock)
+	assert_true(rock.is_in_group("rocks"))
+	await _collect_all()
+	assert_gt(_stores.counts.coal, 0)
 
 
 func test_at_the_beach_the_haul_goes_to_the_village() -> void:

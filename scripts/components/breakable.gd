@@ -31,7 +31,8 @@ func _ready() -> void:
 	health = KINDS[_obstacle.kind][0]
 
 
-## One hit (a cannonball or a ram). Returns true if that destroyed it.
+## One hit (a cannonball or a ram). Returns true if that destroyed it. Damage 0 (a gentle bump)
+## still chips some salvage off.
 func hit(damage := 1) -> bool:
 	if health <= 0:
 		return false
@@ -39,10 +40,23 @@ func hit(damage := 1) -> bool:
 	_shudder()
 	if health > 0:
 		Sfx.play(SOUNDS.get(_obstacle.kind, "rock_crack"), _obstacle, _obstacle.global_position, -8.0, 0.2) # a crack, not yet a break
+		chip()
 	if health <= 0:
 		_burst()
 		return true
 	return false
+
+
+## Every hit that doesn't break it still knocks a little off, which flies aboard (Olivier,
+## 2026-10-24: "i want to get the loot when i hit everything"). A siren's chips are gold.
+func chip() -> void:
+	var resource: String = KINDS[_obstacle.kind][2]
+	var salvage := Salvage.new()
+	salvage.resource = "gold" if resource == "siren" else resource
+	salvage.units = 1
+	salvage.pieces = 2
+	_obstacle.get_parent().add_child(salvage)
+	salvage.global_position = _obstacle.global_position * Vector3(1, 0, 1)
 
 
 func _shudder() -> void:

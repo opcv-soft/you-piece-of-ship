@@ -24,6 +24,7 @@ const PIECES := {"coal": 6, "planks": 5, "gold": 8, "grease": 3, "siren": 1}
 
 var resource := "gold"
 var units := 1 ## what it adds to the stores when it all lands
+var pieces := -1 ## how many bits fly; -1 = the usual for its resource (PIECES)
 
 var _chunks: Array[Dictionary] = []
 var _time := 0.0
@@ -32,7 +33,7 @@ var _delivered := false
 
 func _ready() -> void:
 	add_to_group("salvage")
-	for i in PIECES.get(resource, 4):
+	for i in (pieces if pieces > 0 else PIECES.get(resource, 4)):
 		var piece := _piece()
 		add_child(piece)
 		piece.position = Vector3(randf_range(-1.0, 1.0), 1.0, randf_range(-1.0, 1.0))

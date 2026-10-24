@@ -38,7 +38,7 @@ static func maiden_voyage() -> Resource:
 	contract.events = [
 		[0, "hint", "Welcome aboard! Walk to a station and press Use. Captain: HELM, hold UP for throttle."],
 		[50, "hint", "Engineer: fill a shovel at the COAL pile (back corner), carry it to the ENGINE and press Use. The pile never runs out."],
-		[120, "hint", "Buoys ahead! Navigator: stand at the MAP TABLE and call where they are."],
+		[120, "hint", "Buoys ahead! Navigator: climb to the CROW'S NEST and call where they are."],
 		[360, "leak", "A wave cracked the hull! Fetch a PLANK, put it on the LEAK, hammer it. Someone: PUMP!"],
 		[520, "heat", "Headwind! The engine runs hot. Engineer: at the ENGINE, Jump vents steam (stand clear!)."],
 		[880, "rudder", "Rudder trouble! Bring the PIN to the HELM. Two problems at once: split up!"],

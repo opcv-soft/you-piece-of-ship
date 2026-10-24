@@ -73,7 +73,7 @@ FR = {
     "Use: take one": "Utiliser : en prendre une", "rocks spotted: %d": "rochers repérés : %d", "COAL": "CHARBON", "WET!": "MOUILLÉ !",
     "Use: fill a shovel": "Utiliser : remplir une pelle", "OVERHEAT! Jump: vent  %d": "SURCHAUFFE ! Saut : vapeur  %d", "HOT": "CHAUD",
     "NO COAL! Shovel from the pile": "PLUS DE CHARBON ! Pelle au tas", "COAL LOW! Shovel from the pile": "CHARBON BAS ! Pelle au tas",
-    "WET COAL": "CHARBON MOUILLÉ", "ASTERN %d%%": "ARRIÈRE %d %%", "throttle %d%%": "gaz %d %%", "MAP TABLE  read by ": "TABLE DES CARTES  lue par ",
+    "WET COAL": "CHARBON MOUILLÉ", "ASTERN %d%%": "ARRIÈRE %d %%", "throttle %d%%": "gaz %d %%", "CHART  read by ": "CARTE  lue par ",
     "PORT %d m": "PORT %d m", "P%d AI": "P%d IA", "Rock, %d o'clock, %d m!": "Rocher à %d heures, %d m !", "Port ahead, %d m!": "Port droit devant, %d m !",
     "Clear ahead!": "Rien devant !", "CRASH!": "CRAC !", "%s    Time %s / %s": "%s    Temps %s / %s",
     "Coal low! Fill a shovel at the COAL pile (back corner) and press Use at the ENGINE.":
@@ -101,8 +101,8 @@ FR = {
         "Bienvenue à bord ! Va à un poste et appuie sur Utiliser. Capitaine : à la BARRE, maintiens HAUT pour les gaz.",
     "Engineer: fill a shovel at the COAL pile (back corner), carry it to the ENGINE and press Use. The pile never runs out.":
         "Mécanicien : remplis une pelle au tas de CHARBON (coin arrière), porte-la à la MACHINE et appuie sur Utiliser. Le tas ne s'épuise jamais.",
-    "Buoys ahead! Navigator: stand at the MAP TABLE and call where they are.":
-        "Bouées devant ! Navigateur : va à la TABLE DES CARTES et annonce où elles sont.",
+    "Buoys ahead! Navigator: climb to the CROW'S NEST and call where they are.":
+        "Bouées devant ! Navigateur : grimpe au NID-DE-PIE et annonce où elles sont.",
     "A wave cracked the hull! Fetch a PLANK, put it on the LEAK, hammer it. Someone: PUMP!":
         "Une vague a fendu la coque ! Prends une PLANCHE, pose-la sur la VOIE D'EAU, cloue-la. Quelqu'un : POMPEZ !",
     "Headwind! The engine runs hot. Engineer: at the ENGINE, Jump vents steam (stand clear!).":
@@ -187,9 +187,9 @@ FR = {
     "CANNON": "CANON", "Use: aim   Jump: fire": "Utiliser : viser   Saut : feu", "loaded": "chargé", "Loaded!": "Chargé !",
     "Not loaded!": "Pas chargé !", "CANNONBALLS": "BOULETS", "PIRATES!": "PIRATES !", "Fire!": "Feu !",
     "To the cannon!": "Au canon !", "Load the cannon!": "Je charge le canon !", "BOOM!": "BOUM !",
-    "Pirates sunk! Scoop up the loot": "Pirates coulés ! Ramassez le butin", "Pirates fired a broadside": "Les pirates ont tiré une bordée",
+    "Pirates fired a broadside": "Les pirates ont tiré une bordée",
     "Pirates on the %s side!": "Pirates côté %s !", "Cannonball hit!": "Touchés par un boulet !",
-    "Pirates sunk! Sail through the floating loot to scoop it up.": "Pirates coulés ! Passez sur le butin flottant pour le ramasser.",
+    "Pirates sunk! Their planks fly into your plank box.": "Pirates coulés ! Leurs planches volent dans votre caisse.", "Pirates sunk! Their planks fly aboard": "Pirates coulés ! Leurs planches volent à bord",
     "PIRATES! Outrun them at full speed, or load the cannons on that side (cannonballs in the middle of the deck).":
         "PIRATES ! Semez-les à pleine vitesse, ou chargez les canons de ce côté (boulets au milieu du pont).",
     "Spawn: pirates (port)": "Ajouter : pirates (bâbord)", "Spawn: pirates (starboard)": "Ajouter : pirates (tribord)",

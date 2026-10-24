@@ -114,7 +114,7 @@ COAL LOW! Shovel from the pile,COAL LOW! Shovel from the pile,CHARBON BAS ! Pell
 WET COAL,WET COAL,CHARBON MOUILLÉ
 ASTERN %d%%,ASTERN %d%%,ARRIÈRE %d %%
 throttle %d%%,throttle %d%%,gaz %d %%
-MAP TABLE  read by ,MAP TABLE  read by ,TABLE DES CARTES  lue par 
+CHART  read by ,CHART  read by ,CARTE  lue par 
 PORT %d m,PORT %d m,PORT %d m
 P%d AI,P%d AI,P%d IA
 "Rock, %d o'clock, %d m!","Rock, %d o'clock, %d m!","Rocher à %d heures, %d m !"
@@ -157,7 +157,7 @@ Fog Bank,Fog Bank,Banc de brume
 Medicine for the lighthouse keeper. The fog is so thick the chart can't help much: use the telescope.,Medicine for the lighthouse keeper. The fog is so thick the chart can't help much: use the telescope.,Des remèdes pour le gardien du phare. La brume est si épaisse que la carte aide peu : utilise la longue-vue.
 "Welcome aboard! Walk to a station and press Use. Captain: HELM, hold UP for throttle.","Welcome aboard! Walk to a station and press Use. Captain: HELM, hold UP for throttle.","Bienvenue à bord ! Va à un poste et appuie sur Utiliser. Capitaine : à la BARRE, maintiens HAUT pour les gaz."
 "Engineer: fill a shovel at the COAL pile (back corner), carry it to the ENGINE and press Use. The pile never runs out.","Engineer: fill a shovel at the COAL pile (back corner), carry it to the ENGINE and press Use. The pile never runs out.","Mécanicien : remplis une pelle au tas de CHARBON (coin arrière), porte-la à la MACHINE et appuie sur Utiliser. Le tas ne s'épuise jamais."
-Buoys ahead! Navigator: stand at the MAP TABLE and call where they are.,Buoys ahead! Navigator: stand at the MAP TABLE and call where they are.,Bouées devant ! Navigateur : va à la TABLE DES CARTES et annonce où elles sont.
+Buoys ahead! Navigator: climb to the CROW'S NEST and call where they are.,Buoys ahead! Navigator: climb to the CROW'S NEST and call where they are.,Bouées devant ! Navigateur : grimpe au NID-DE-PIE et annonce où elles sont.
 "A wave cracked the hull! Fetch a PLANK, put it on the LEAK, hammer it. Someone: PUMP!","A wave cracked the hull! Fetch a PLANK, put it on the LEAK, hammer it. Someone: PUMP!","Une vague a fendu la coque ! Prends une PLANCHE, pose-la sur la VOIE D'EAU, cloue-la. Quelqu'un : POMPEZ !"
 "Headwind! The engine runs hot. Engineer: at the ENGINE, Jump vents steam (stand clear!).","Headwind! The engine runs hot. Engineer: at the ENGINE, Jump vents steam (stand clear!).","Vent de face ! La machine chauffe. Mécanicien : à la MACHINE, Saut lâche la vapeur (écartez-vous !)."
 Big wave coming: grab a station so you don't fall over!,Big wave coming: grab a station so you don't fall over!,Grosse vague en approche : accroche-toi à un poste pour ne pas tomber !
@@ -318,11 +318,11 @@ Fire!,Fire!,Feu !
 To the cannon!,To the cannon!,Au canon !
 Load the cannon!,Load the cannon!,Je charge le canon !
 BOOM!,BOOM!,BOUM !
-Pirates sunk! Scoop up the loot,Pirates sunk! Scoop up the loot,Pirates coulés ! Ramassez le butin
 Pirates fired a broadside,Pirates fired a broadside,Les pirates ont tiré une bordée
 Pirates on the %s side!,Pirates on the %s side!,Pirates côté %s !
 Cannonball hit!,Cannonball hit!,Touchés par un boulet !
-Pirates sunk! Sail through the floating loot to scoop it up.,Pirates sunk! Sail through the floating loot to scoop it up.,Pirates coulés ! Passez sur le butin flottant pour le ramasser.
+Pirates sunk! Their planks fly into your plank box.,Pirates sunk! Their planks fly into your plank box.,Pirates coulés ! Leurs planches volent dans votre caisse.
+Pirates sunk! Their planks fly aboard,Pirates sunk! Their planks fly aboard,Pirates coulés ! Leurs planches volent à bord
 "PIRATES! Outrun them at full speed, or load the cannons on that side (cannonballs in the middle of the deck).","PIRATES! Outrun them at full speed, or load the cannons on that side (cannonballs in the middle of the deck).","PIRATES ! Semez-les à pleine vitesse, ou chargez les canons de ce côté (boulets au milieu du pont)."
 Spawn: pirates (port),Spawn: pirates (port),Ajouter : pirates (bâbord)
 Spawn: pirates (starboard),Spawn: pirates (starboard),Ajouter : pirates (tribord)

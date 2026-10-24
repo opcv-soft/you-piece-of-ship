@@ -15,3 +15,8 @@ Feature: Sea battles
   Scenario: Outrun them
     When the ship sails at full throttle
     Then the pirates fall behind and give up
+
+  Scenario: The aim guide shows where the ball will land
+    Given a player takes a cannon
+    Then a dotted line runs across the water to a ring where the ball will land
+    And it turns gold when the shot would hit a pirate ship or anything breakable

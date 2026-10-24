@@ -31,7 +31,7 @@ func spawn_enemy(side: float) -> Node3D:
 	enemy.global_position = ship.global_position - voyage._handling.forward() * 35.0 + right * side * 22.0
 	enemy.global_position.y = 0.0
 	enemy.rotation.y = ship.rotation.y
-	enemy.sunk.connect(func(_e): voyage_log.add("Pirates sunk! Scoop up the loot", "good"); voyage.show_hint(voyage.tr("Pirates sunk! Sail through the floating loot to scoop it up.")))
+	enemy.sunk.connect(func(_e): voyage_log.add("Pirates sunk! Their planks fly aboard", "good"); voyage.show_hint(voyage.tr("Pirates sunk! Their planks fly into your plank box.")))
 	enemy.broadside.connect(func(): voyage_log.add("Pirates fired a broadside", "info"))
 	voyage_log.add("Pirates on the %s side!", "bad", ["starboard" if side > 0.0 else "port"])
 	voyage.show_hint(voyage.tr("PIRATES! Outrun them at full speed, or load the cannons on that side (cannonballs in the middle of the deck)."))
