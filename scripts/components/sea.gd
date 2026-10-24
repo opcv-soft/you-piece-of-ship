@@ -46,6 +46,8 @@ func _process(delta: float) -> void:
 
 ## Storm colours: a slate-grey sea, whiter foam, rougher water.
 func set_storm(on: bool) -> void:
+	if fft:
+		fft.set_storm(on)
 	if on:
 		_material.set_shader_parameter("deep_color", Color(0.12, 0.2, 0.32))
 		_material.set_shader_parameter("shallow_color", Color(0.3, 0.45, 0.55))
@@ -64,3 +66,25 @@ func swell(toward: Vector3, from_side: Vector3, height := 1.6) -> void:
 	_material.set_shader_parameter("swell_direction", Vector2(from_side.x, from_side.z))
 	_swell_age = 0.0
 	_material.set_shader_parameter("swell_height", height)
+
+
+# --- The realistic (FFT) sea -----------------------------------------------------------------
+
+const FFTSea = preload("res://scripts/components/fft_sea.gd")
+
+var fft: Node3D ## the realistic sea, when it runs
+
+
+## Switches to the realistic FFT ocean (if this machine can run it). Returns whether it did.
+func use_fft() -> bool:
+	if fft or not FFTSea.supported():
+		return fft != null
+	fft = FFTSea.new()
+	get_parent().add_child.call_deferred(fft) # stays put in the world; it follows the camera itself
+	visible = false
+	return true
+
+
+## Sea surface height at a world point: the FFT waves when they run, else calm.
+func height_at(world: Vector3) -> float:
+	return fft.height_at(world) if fft and fft.is_inside_tree() else 0.0

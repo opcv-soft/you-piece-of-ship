@@ -25,6 +25,10 @@ var list_roll := 0.0 ## radians of steady heel (positive lowers starboard, +Z), 
 var list_sources := {} ## system name -> extra heel in radians (water, load), added to list_roll
 var list_pitch := 0.0 ## radians of steady trim (positive lifts the bow)
 var sink := 0.0 ## metres lower in the water
+var sea: Node ## the realistic sea, if any: the ship then rides its real wave heights
+var _sea_heave := 0.0
+var _sea_pitch := 0.0
+var _sea_roll := 0.0
 
 var _time := 0.0
 var _rest_height := 0.0
@@ -47,9 +51,30 @@ func _physics_process(delta: float) -> void:
 	_time += delta
 	_advance_wave(delta)
 	var pose := sample(_time)
+	_ride_sea(delta)
 	# The bow points along +X, so roll turns around X and pitch around Z.
-	_parent.rotation = Vector3(pose.roll + total_list() + wave_roll(), _parent.rotation.y, pose.pitch + list_pitch)
-	_parent.position.y = _rest_height + pose.heave - sink # x and z belong to ShipHandling
+	_parent.rotation = Vector3(pose.roll * 0.6 + _sea_roll + total_list() + wave_roll(), _parent.rotation.y,
+			pose.pitch * 0.6 + _sea_pitch + list_pitch) if sea and sea.fft else \
+			Vector3(pose.roll + total_list() + wave_roll(), _parent.rotation.y, pose.pitch + list_pitch)
+	var heave: float = _sea_heave if sea and sea.fft else pose.heave
+	_parent.position.y = _rest_height + heave - sink # x and z belong to ShipHandling
+
+
+## With the realistic sea, sample its height under the bow, stern and both sides: the ship rises,
+## pitches and rolls with the real waves (smoothed, so it rides rather than jitters).
+func _ride_sea(delta: float) -> void:
+	if sea == null or sea.fft == null or not sea.fft.is_inside_tree():
+		return
+	var basis := _parent.global_basis
+	var at := _parent.global_position
+	var bow: float = sea.height_at(at + basis.x * 9.0)
+	var stern: float = sea.height_at(at - basis.x * 9.0)
+	var port: float = sea.height_at(at - basis.z * 3.5)
+	var starboard: float = sea.height_at(at + basis.z * 3.5)
+	var blend := minf(1.0, delta * 3.0)
+	_sea_heave = lerpf(_sea_heave, (bow + stern + port + starboard) * 0.25 * intensity, blend)
+	_sea_pitch = lerpf(_sea_pitch, atan2(bow - stern, 18.0) * intensity, blend)
+	_sea_roll = lerpf(_sea_roll, atan2(port - starboard, 7.0) * intensity, blend)
 
 
 ## Steady heel from everything: list_roll plus every system's list source.

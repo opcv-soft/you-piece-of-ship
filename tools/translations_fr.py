@@ -201,6 +201,7 @@ FR = {
     "off the starboard bow": "par tribord avant", "off the port bow": "par bâbord avant",
     "on the starboard beam": "par le travers tribord", "on the port beam": "par le travers bâbord",
     "off the starboard quarter": "par tribord arrière", "off the port quarter": "par bâbord arrière",
+    "Realistic sea": "Mer réaliste", "CROW'S NEST": "NID-DE-PIE", "Use: climb up": "Utiliser : grimper", "Up the mast!": "En haut du mât !",
     "Rock": "Rocher", "Wreck": "Épave", "Whale": "Baleine", "Atoll": "Atoll", "Coast": "Côte",
     "Show collision shapes": "Voir les formes de collision", "Test Drive: open ocean, no obstacles": "Essai libre : océan ouvert, sans obstacles",
     "Sail again  (R)": "Repartir  (R)", "World map  (Enter)": "Carte  (Entrée)", "Change crew  (J)": "Changer d'équipage  (J)",

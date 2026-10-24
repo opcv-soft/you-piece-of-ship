@@ -53,6 +53,8 @@ var _pirates := VoyagePirates.new(self)
 
 func _ready() -> void:
 	add_to_group("voyage")
+	if Session.realistic_sea and $Water.use_fft():
+		$Ship/WaveMotion.sea = $Water
 	if contract == null:
 		contract = ContractLibrary.by_index(Session.contract_index)
 	finish_x = contract.length
