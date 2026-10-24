@@ -68,5 +68,5 @@ Hypothesis → spec → test → greybox → playtest → keep or revert → upd
 English and French. The game follows the computer's language; switch it any time in **Settings**. Translations live in `translations/strings.csv`, generated from `tools/translations_fr.py` (the English text is the key; the title is never translated).
 
 ## Credits
-- Realistic ocean: [godot4-oceanfft](https://github.com/tessarakkt/godot4-oceanfft) by Tessa Avery (MIT), in `addons/tessarakkt.oceanfft/`. Switch it off in Settings → "Realistic sea" to get the painted sea back.
+- Realistic ocean: [godot4-oceanfft](https://github.com/tessarakkt/godot4-oceanfft) by Tessa Avery (MIT), in `addons/tessarakkt.oceanfft/` (its surface shader is modified here: hull mask, calm water by the hull, edge foam). Switch it off in Settings → "Realistic sea" to get the painted sea back.
 - Sound effects: original, synthesised by `tools/make_sfx.py` (no third-party samples).

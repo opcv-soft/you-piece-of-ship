@@ -76,10 +76,11 @@ var fft: Node3D ## the realistic sea, when it runs
 
 
 ## Switches to the realistic FFT ocean (if this machine can run it). Returns whether it did.
-func use_fft() -> bool:
+func use_fft(ship: Node3D = null) -> bool:
 	if fft or not FFTSea.supported():
 		return fft != null
 	fft = FFTSea.new()
+	fft.ship = ship
 	get_parent().add_child.call_deferred(fft) # stays put in the world; it follows the camera itself
 	visible = false
 	return true
