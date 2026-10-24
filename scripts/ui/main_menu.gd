@@ -270,6 +270,11 @@ func _build() -> void:
 	full.button_pressed = Session.fullscreen
 	full.toggled.connect(set_fullscreen)
 	_settings.get_child(0).add_child(full)
+	var sea := CheckButton.new()
+	sea.set_meta("key", "Realistic sea")
+	sea.button_pressed = Session.realistic_sea
+	sea.toggled.connect(func(on): Session.realistic_sea = on; Session.save_game())
+	_settings.get_child(0).add_child(sea)
 	_settings.get_child(0).add_child(_back_button())
 
 	_join = _panel("Join Game")

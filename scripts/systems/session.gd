@@ -24,6 +24,7 @@ var last_records := {"score": false, "time": false} ## did the last voyage set a
 var language := "" ## "en" or "fr"; empty = follow the computer's language
 var music_volume_db := -8.0
 var fullscreen := false
+var realistic_sea := true ## the FFT ocean (falls back to the painted sea where it can't run)
 var last_join_address := "" ## the friend's address last used with Join
 var persist := true ## false while running automated tests: never touch the player's save
 
@@ -171,7 +172,7 @@ func save_game() -> void:
 	if file:
 		file.store_string(JSON.stringify({"money": money, "upgrades": upgrades, "unlocked": unlocked,
 				"best_scores": best_scores, "best_times": best_times, "stars": stars, "hats": hats, "seen_oceans": seen_oceans, "ai_crew": ai_crew, "language": language,
-				"music_volume_db": music_volume_db, "fullscreen": fullscreen,
+				"music_volume_db": music_volume_db, "fullscreen": fullscreen, "realistic_sea": realistic_sea,
 				"last_join_address": last_join_address}))
 
 
@@ -195,6 +196,7 @@ func load_game() -> void:
 		language = data.get("language", "")
 		music_volume_db = float(data.get("music_volume_db", -8.0))
 		fullscreen = bool(data.get("fullscreen", false))
+		realistic_sea = bool(data.get("realistic_sea", true))
 		last_join_address = data.get("last_join_address", "")
 		ai_crew = {}
 		var saved_ai = data.get("ai_crew", {})
