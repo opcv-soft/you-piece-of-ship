@@ -54,7 +54,7 @@ static func reef_run() -> Resource:
 	contract.title = "Reef Run"
 	contract.blurb = "Six crates of tinned sardines through the Gull Reef. Five minutes, if nothing breaks."
 	contract.length = 1300.0
-	contract.deadline = 330.0
+	contract.deadline = 375.0 # 2026-10-24: the real hull shape and the climb to the nest cost the AI crew ~30 s
 	contract.difficulty = 2
 	# Pacing (DESIGN.md section 7): calm departure, first complication, calm, overlap, peak, port.
 	contract.rock_rows = [

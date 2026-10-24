@@ -17,12 +17,15 @@ const CATCHES := [
 	["Treasure!", "chest", 150, 3.0],
 ]
 
-enum Phase { IDLE, WAITING, BITE }
+enum Phase { IDLE, WAITING, BITE, REELING }
+
+const ItemScene = preload("res://scenes/greybox/item.tscn")
 
 @export var bite_min := 3.0 ## seconds before a fish bites, at least
 @export var bite_max := 8.0
 @export var bite_window := 0.9 ## seconds to strike once the float dips
 @export var cast_distance := 3.2 ## metres out from the rail
+@export var reel_seconds := 1.3 ## reeling the catch in, over the rail and onto the deck
 
 var phase := Phase.IDLE
 var wait_left := 0.0
@@ -34,6 +37,9 @@ var _rod: Node3D
 var _bobber: Node3D
 var _line: MeshInstance3D
 var _time := 0.0
+var _reel_left := 0.0
+var _reeled: Node3D ## the catch on the end of the line while it's reeled in
+var _reel_catch := {}
 
 
 func _ready() -> void:
@@ -119,6 +125,8 @@ func occupy(player: Node3D) -> bool:
 
 
 func release(player: Node3D) -> void:
+	if _reeled:
+		_land_catch() # let go mid-reel: the fish still lands on deck
 	super.release(player)
 	if occupants.is_empty():
 		phase = Phase.IDLE
@@ -144,11 +152,65 @@ func strike(player: Node3D) -> void:
 		if voyage and "bonus_points" in voyage:
 			voyage.bonus_points += int(catch.points)
 		player.think(tr("%s +%d") % [tr(catch.name), catch.points], 2.0, "shout")
-		_show_catch(catch)
 		caught.emit(catch, player)
+		_start_reel(catch)
+		return
 	elif phase == Phase.WAITING:
 		player.think(tr("Too early!"), 1.2)
 		got_away.emit(player)
+	elif phase == Phase.REELING:
+		return # busy bringing one in
+	_cast()
+
+
+## The catch comes up on the line: reeled toward the rod, swung over the rail, dropped on deck.
+func _start_reel(catch: Dictionary) -> void:
+	phase = Phase.REELING
+	_reel_left = reel_seconds
+	_reel_catch = catch
+	var path := MODELS + String(catch.model) + ".glb"
+	_reeled = (load(path) as PackedScene).instantiate()
+	Toon.paint(_reeled)
+	_reeled.scale = Vector3.ONE * (1.6 if catch.model != "chest" else 0.9)
+	_reeled.position = _bobber.position
+	add_child(_reeled)
+
+
+func _reel(delta: float) -> void:
+	_reel_left -= delta
+	var t := 1.0 - clampf(_reel_left / reel_seconds, 0.0, 1.0)
+	var side := signf(position.z) if position.z != 0.0 else 1.0
+	var water := Vector3(0.0, _bobber.position.y, side * cast_distance)
+	var over_rail := _tip() + Vector3(0, -0.4, 0)
+	var deck := Vector3(0.3, 0.6, -side * 0.9)
+	if t < 0.65:
+		_reeled.position = water.lerp(over_rail, ease(t / 0.65, 0.6)) # up the line, wriggling
+		_reeled.rotation.z = sin(_time * 25.0) * 0.5
+	else:
+		var u := (t - 0.65) / 0.35
+		_reeled.position = over_rail.lerp(deck, u) + Vector3(0, sin(u * PI) * 0.8, 0) # swung onto the deck
+		_reeled.rotation.z = lerpf(_reeled.rotation.z, PI / 2.0, u)
+	_bobber.position = _reeled.position
+	if _reel_left <= 0.0:
+		_land_catch()
+
+
+## The fish stays on deck, flopping about (treasure just bursts into coins).
+func _land_catch() -> void:
+	var where := _reeled.global_position
+	_reeled.queue_free()
+	_reeled = null
+	var ship := get_parent()
+	var items := ship.get_node_or_null("Items")
+	if _reel_catch.model != "chest" and items:
+		var fish: Node3D = ItemScene.instantiate()
+		fish.kind = "fish"
+		fish.species = _reel_catch.model
+		items.add_child(fish)
+		var local: Vector3 = ship.to_local(where)
+		fish.position = Vector3(local.x, 0.0, local.z)
+	elif is_inside_tree():
+		UI.play("coin")
 	_cast()
 
 
@@ -165,24 +227,6 @@ func roll_catch() -> Dictionary:
 	return {"name": CATCHES[0][0], "model": CATCHES[0][1], "points": CATCHES[0][2]}
 
 
-## The catch flies out of the water in an arc onto the deck and pops away.
-func _show_catch(catch: Dictionary) -> void:
-	var path := MODELS + String(catch.model) + ".glb"
-	if not ResourceLoader.exists(path):
-		return
-	var fish: Node3D = (load(path) as PackedScene).instantiate()
-	Toon.paint(fish)
-	fish.position = _bobber.position
-	fish.scale = Vector3.ONE * (1.6 if catch.model != "chest" else 0.9)
-	add_child(fish)
-	var tween := fish.create_tween()
-	tween.tween_property(fish, "position", Vector3(0, 3.2, 0), 0.45).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tween.parallel().tween_property(fish, "rotation:z", TAU, 0.45)
-	tween.tween_interval(0.5)
-	tween.tween_property(fish, "scale", Vector3.ZERO, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
-	tween.tween_callback(fish.queue_free)
-
-
 func _physics_process(delta: float) -> void:
 	_time += delta
 	match phase:
@@ -193,6 +237,10 @@ func _physics_process(delta: float) -> void:
 				bite_left = bite_window
 				if occupant:
 					occupant.think("!", bite_window, "shout")
+		Phase.REELING:
+			_reel(delta)
+			_update_line()
+			return
 		Phase.BITE:
 			bite_left -= delta
 			if bite_left <= 0.0:
@@ -201,13 +249,23 @@ func _physics_process(delta: float) -> void:
 					got_away.emit(occupant)
 				_cast()
 	if _bobber.visible:
-		var side := signf(position.z) if position.z != 0.0 else 1.0
-		var dip := -0.35 if phase == Phase.BITE and fmod(_time, 0.3) < 0.15 else 0.0
-		# The float sits on the sea surface (the ship's deck is 1.2 m above it).
-		var sea_y := to_local(Vector3(0, 0.05, 0) + global_position * Vector3(1, 0, 1)).y
-		_bobber.position = Vector3(0.0, sea_y + sin(_time * 2.0) * 0.06 + dip, side * cast_distance)
-		var tip := _tip()
-		var span := _bobber.position - tip
-		_line.position = tip + span * 0.5
-		(_line.mesh as CylinderMesh).height = span.length()
-		_line.basis = Basis(Quaternion(Vector3.UP, span.normalized()))
+		_float_bobber()
+		_update_line()
+
+
+func _float_bobber() -> void:
+	var side := signf(position.z) if position.z != 0.0 else 1.0
+	var dip := -0.35 if phase == Phase.BITE and fmod(_time, 0.3) < 0.15 else 0.0
+	# The float sits on the sea surface (the ship's deck is 1.2 m above it).
+	var sea_y := to_local(Vector3(0, 0.05, 0) + global_position * Vector3(1, 0, 1)).y
+	_bobber.position = Vector3(0.0, sea_y + sin(_time * 2.0) * 0.06 + dip, side * cast_distance)
+
+
+func _update_line() -> void:
+	var tip := _tip()
+	var span := _bobber.position - tip
+	if span.length() < 0.05:
+		return
+	_line.position = tip + span * 0.5
+	(_line.mesh as CylinderMesh).height = span.length()
+	_line.basis = Basis(Quaternion(Vector3.UP, span.normalized()))

@@ -110,7 +110,7 @@ func _station_job(station: Node3D) -> String:
 			return "engine"
 		"Pump":
 			return "pump"
-		"MapTable", "Telescope":
+		"Lookout", "Telescope":
 			return "navigator"
 	return "carpenter" # leaks and the cooling pipe
 
@@ -166,7 +166,7 @@ func is_working() -> bool:
 		return true
 	if Vector2(_player.velocity.x, _player.velocity.z).length() > 0.4:
 		return true
-	return job == "navigator" and _ship.get_node("MapTable").crew_nearby().has(_player)
+	return job == "navigator" and _ship.get_node("Lookout").occupant == _player
 
 
 ## The most urgent carpenter task nobody else is already on (two may hammer the same plank).

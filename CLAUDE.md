@@ -20,7 +20,7 @@ Every script starts with a `##` line saying what it does; `grep -m1 "^##" path` 
 - `scripts/components/` — one small node per job:
   - Ship systems: `hull_system` + `breach` (leaks), `engine_system` + `engine_station` + `coal_pile` + `engine_gauge` + `engine_heat_visual`, `rudder_system`, `load_system` + `cargo_bay`, `repair_station` (cooling pipe).
   - Sailing and sea: `ship_handling` (speed/steering), `wave_motion` (rocking), `sea`, `ship_wake`, `shared_camera`.
-  - Stations: `station` (base), `helm_station`, `telescope_station`, `map_chart`.
+  - Stations: `station` (base), `helm_station`, `lookout_station` (crow's nest, replaces the map table), `telescope_station` (fog), `map_chart` (the lookout's chart HUD).
   - Things to carry or hit: `item`, `item_dispenser`, `overboard_rail`, `rock`, `loot`, `cannon`, `cannon_projectile`, `enemy_ship`, `fishing_spot`.
   - Look and feel: `game_feel` (juice), `adaptive_music`, `thought_bubble`, `crew_model`, `crew_sprite`.
 - `scripts/contracts/` — `contract.gd` (one voyage's data), `contract_library.gd` (all hand-made contracts).

@@ -2,7 +2,7 @@ extends RefCounted
 ## AI jobs at the helm, the pump and the engine: walk to the station, steer around the known rocks
 ## (autopilot), feed and vent the furnace. Owned by ai_crew.gd.
 
-const STATION_FOR := {"helm": "Helm", "navigator": "MapTable", "engine": "Engine", "pump": "Pump"}
+const STATION_FOR := {"helm": "Helm", "navigator": "Lookout", "engine": "Engine", "pump": "Pump"}
 
 var ai: Node
 
@@ -114,7 +114,7 @@ static func steer_for(here: Vector3, yaw: float, rocks: Array, half_width: float
 
 func known_rocks() -> Array:
 	var ship: Node3D = ai._ship
-	var chart_on: bool = ship.get_node("MapTable").is_active()
+	var chart_on: bool = ship.get_node("Lookout").is_active()
 	var sight := chart_range()
 	var known := []
 	for rock in ai.get_tree().get_nodes_in_group("rocks"):

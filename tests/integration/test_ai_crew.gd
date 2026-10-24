@@ -116,7 +116,7 @@ func test_given_navigator_and_rock_ahead_then_calls_it_out() -> void:
 	await wait_seconds(6.0)
 	assert_string_contains(_crew[3].bubble.text, "fathoms", "a shout bubble above the navigator, in sailor's units")
 	assert_eq(_crew[3].bubble.style, "shout")
-	assert_true(_ship.get_node("MapTable").is_active(), "standing at the chart")
+	assert_true(_ship.get_node("Lookout").is_up(), "up in the crow's nest")
 
 
 func test_given_navigator_with_carpenter_secondary_when_clear_sea_and_leak_then_patches() -> void:
@@ -145,7 +145,7 @@ func test_given_ai_navigator_then_chart_stays_off_screen_and_rocks_are_called_ou
 	await _human_at_helm()
 	_ai(3, "navigator")
 	await wait_seconds(5.0)
-	assert_true(_ship.get_node("MapTable").is_active(), "the AI reads the chart")
+	assert_true(_ship.get_node("Lookout").is_active(), "the AI watches from the crow's nest")
 	assert_false(_level.get_node("HUD/MapChart").visible, "but only a human reader puts it on screen")
 
 

@@ -20,7 +20,7 @@ const Toon = preload("res://scripts/systems/toon.gd")
 const SHIP_MODEL := "res://assets/art/export/models/ship.glb"
 const MODELS := "res://assets/art/export/models/"
 ## Station -> painted prop (modelled in the station's own frame, see tools/blender/build_props.py).
-const STATION_PROPS := {"Helm": "helm", "MapTable": "map_table", "PlankBox": "plank_box", "PinBox": "pin_box",
+const STATION_PROPS := {"Helm": "helm", "PlankBox": "plank_box", "PinBox": "pin_box",
 		"Pump": "pump", "Engine": "engine", "CoolingPipe": "cooling_pipe", "Telescope": "telescope"}
 const PUMP_HINGE := Vector3(0.0, 1.45, -0.85)
 const PUMP_SPOUT := Vector3(0.0, 0.85, -1.8)
@@ -59,6 +59,7 @@ func _ready() -> void:
 		_paint()
 	$Engine.add_child(EngineHeatVisual.new())
 	add_child(ShipWake.new())
+	$ShipHandling.impact.connect(func(_rock): lurch(Vector2($ShipHandling.impact_speed, 0.0)))
 	for i in CANNONS.size():
 		var cannon := Cannon.new()
 		cannon.name = "Cannon%d" % (i + 1)
@@ -211,6 +212,18 @@ func knock_down_crew(push: Vector2) -> Array[Node3D]:
 func _on_wave_struck(side: float) -> void:
 	# The wave lifts its side, so everyone loose falls toward the other side.
 	knock_down_crew(Vector2(0.0, -side))
+	lurch(Vector2(0.0, -side * 3.0))
+
+
+## A sudden lurch (crash, cannonball, big wave): anyone carrying a cannonball loses it, and every
+## loose thing on deck keeps moving (push: ship-local x/z metres per second).
+func lurch(push: Vector2) -> void:
+	for player in get_tree().get_nodes_in_group("crew"):
+		if player.carried and player.carried.kind == "ball":
+			player.carried.drop(push * 0.8)
+	for item in get_tree().get_nodes_in_group("items"):
+		if is_ancestor_of(item):
+			item.jolt(push)
 
 
 ## A black smudge of spilled coal on the deck (cosmetic; the oldest fade away after a while).

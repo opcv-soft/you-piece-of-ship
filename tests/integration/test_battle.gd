@@ -112,3 +112,18 @@ func test_an_ai_gunner_loads_and_fires() -> void:
 		cannon.fired.connect(func(_b): fired[0] = true)
 	await wait_seconds(12.0)
 	assert_true(fired[0], "the AI gunner fired at the pirates")
+
+
+func test_a_hit_knocks_a_carried_cannonball_loose_and_it_rolls_into_crew() -> void:
+	var carrier: Node3D = _crew[1]
+	var victim: Node3D = _crew[2]
+	carrier.position = Vector3(-4.0, 0.05, 0.0)
+	victim.position = Vector3(-1.5, 0.05, 0.0)
+	await wait_physics_frames(2)
+	var ball: Node3D = _ship.get_node("BallRack").take()
+	ball.pick_up(carrier)
+	_ship.lurch(Vector2(6.0, 0.0)) # a crash: everything loose keeps going toward the bow
+	assert_null(carrier.carried, "the ball is dropped")
+	assert_gt(ball.velocity.x, 3.0, "and rolls forward")
+	await wait_seconds(1.0)
+	assert_gt(victim.knocked, 0.0, "it bowls a sailor over")

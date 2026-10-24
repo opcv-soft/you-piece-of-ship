@@ -1,5 +1,5 @@
 extends RefCounted
-## The AI navigator: reads the map table (or the telescope in fog) and shouts the nearest danger
+## The AI navigator: climbs to the crow's nest and watches with the spyglass (or the telescope in fog) and shouts the nearest danger
 ## the way sailors say it. Owned by ai_crew.gd; the static helpers are tested on their own.
 
 const AISteering = preload("res://scripts/ai/jobs/ai_steering.gd")
@@ -14,7 +14,7 @@ func _init(owner_ai: Node) -> void:
 func navigate(delta: float) -> void:
 	var player: CharacterBody3D = ai._player
 	ai._drop_carried()
-	ai.intend(ai.tr("To the map!"))
+	ai.intend(ai.tr("Up the mast!"))
 	# In fog the chart sees little: the navigator takes the telescope instead.
 	var telescope: Node3D = ai._ship.get_node("Telescope")
 	if telescope.enabled:
@@ -23,9 +23,13 @@ func navigate(delta: float) -> void:
 				ai._use_on(telescope)
 			return
 	else:
-		var table: Node3D = ai._ship.get_node("MapTable")
-		if not ai._walk_to(table.global_position, delta, 0.8):
+		var nest: Node3D = ai._ship.get_node("Lookout")
+		if player.station != nest:
+			if ai._walk_to(nest.global_position, delta, 0.9):
+				ai._use_on(nest)
 			return
+		if not nest.is_up():
+			return # still climbing
 	ai._callout_left -= delta
 	if ai._callout_left <= 0.0:
 		ai._callout_left = ai.callout_interval

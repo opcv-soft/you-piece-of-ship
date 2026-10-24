@@ -65,7 +65,7 @@ func test_given_port_out_of_range_then_chart_has_port_distance() -> void:
 
 func test_given_voyage_running_then_deadline_shown_and_turns_red_when_late() -> void:
 	var status: Label = _level.get_node("HUD/Status")
-	assert_string_contains(status.text, "/ 5:30")
+	assert_string_contains(status.text, "/ 6:15")
 	_level.elapsed = 400.0
 	await wait_physics_frames(2)
 	var colour: Color = status.get_theme_color("font_color")

@@ -43,6 +43,8 @@ func cannon_hit(point: Vector3) -> void:
 	var ship: Node3D = voyage._ship
 	voyage.hits += 1
 	voyage.get_node("Ship/HullSystem").add_breach(ship.to_local(point))
+	var hit_side := signf(ship.to_local(point).z)
+	ship.lurch(Vector2(0.0, -hit_side * 2.5)) # the blow shoves everything loose across the deck
 	voyage.get_node("VoyageLog").add("Cannonball hit!", "bad")
 	voyage.get_node("Music").sting("sting_crash")
 	voyage._banner.text = voyage.tr("BOOM!")
