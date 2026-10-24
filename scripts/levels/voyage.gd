@@ -59,7 +59,7 @@ var _countdown := VoyageCountdown.new(self) ## 5 s to get to your posts
 
 func _ready() -> void:
 	add_to_group("voyage")
-	if Session.realistic_sea and $Water.use_fft():
+	if Session.realistic_sea and $Water.use_fft($Ship):
 		$Ship/WaveMotion.sea = $Water
 	if contract == null:
 		contract = ContractLibrary.by_index(Session.contract_index)

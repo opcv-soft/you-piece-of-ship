@@ -116,6 +116,42 @@ instance uniform float max_lod_morph_distance;
 
 // Varyings
 /******************************************************************************/
+// --- You Piece of Ship additions (2026-10-24) -----------------------------------------------
+// The hull mask: no water inside the ship's outline, calmer water right next to it, so the sea
+// never shows through the deck. Edge foam where the water meets anything (hull, rocks, beach).
+uniform vec3 hull_center = vec3(0.0, 0.0, 100000.0);
+uniform vec2 hull_forward = vec2(1.0, 0.0);
+uniform float hull_calm_distance = 4.0; // metres beside the hull where the waves die down
+uniform float edge_foam_width = 0.9; // metres of foam where water touches something
+uniform vec4 edge_foam_color : source_color = vec4(0.95, 0.98, 1.0, 1.0);
+varying vec2 hull_local;
+
+// The hull's half-width at a point along it (same shape as the painted ship, ship_handling.gd).
+float hull_half_width(float x) {
+	if (x > 8.2) {
+		return 3.75 * pow(max(cos(clamp((x - 8.2) / 6.4, 0.0, 1.0) * 1.5707963), 0.0), 0.9);
+	}
+	if (x < -9.4) {
+		float t = (x + 9.4) / -1.5;
+		return 3.75 - 0.5 * t * t;
+	}
+	return 3.75;
+}
+
+// Signed distance (roughly) from a point to the hull outline: negative inside.
+float hull_distance(vec2 local) {
+	float across = abs(local.y) - hull_half_width(local.x);
+	float along = max(-10.9 - local.x, local.x - 14.6);
+	return max(across, along);
+}
+
+vec2 to_hull(vec2 world_xz) {
+	vec2 d = world_xz - hull_center.xz;
+	vec2 right = vec2(-hull_forward.y, hull_forward.x);
+	return vec2(dot(d, hull_forward), dot(d, right));
+}
+// ----------------------------------------------------------------------------------------------
+
 varying vec3 world_vertex;
 varying float jacobian_determinant;
 varying float wave_height;
@@ -147,6 +183,10 @@ void vertex() {
 	// Vertex Offset
 	// Use the world vertex XZ coordinates as UV for simplicity
 	vec3 displacement = get_displacement(domain_warped_uv);
+	// Calm water hugging the hull (and none inside it): crests can't climb over the deck.
+	hull_local = to_hull(VERTEX.xz);
+	float hull_d = hull_distance(hull_local);
+	displacement *= mix(0.15, 1.0, smoothstep(0.0, hull_calm_distance, hull_d));
 	VERTEX += displacement;
 	world_vertex = VERTEX;
 	
@@ -170,6 +210,9 @@ void vertex() {
 
 
 void fragment() {
+	if (hull_distance(to_hull(world_vertex.xz)) < -0.2) {
+		discard; // inside the ship: no sea
+	}
 	// Calculate fragments Fresnel factor
 	float fresnel_factor = clamp(pow(abs(1.0 - dot(NORMAL, normalize(VIEW))), fresnel_power), -1.0, 1.0);
 	float fresnel = fresnel_factor * fresnel_strength + fresnel_offset;
@@ -200,7 +243,13 @@ void fragment() {
 	// Whitecap Rendering
 	foam_mix_factor = clamp((-jacobian_determinant + foam_jacobian_limit) * foam_coverage, 0.0, 1.0);
 	foam_mix_factor = (foam_mix_factor * foam_mix_factor) * foam_mix_strength;
-	ALBEDO = mix(water_color, texture(foam_texture, world_vertex.xz * uv_scale).rgb, foam_mix_factor);
+	// Edge foam: a soft white ring where the water meets the hull, rocks, beach, whales...
+	vec4 behind = INV_PROJECTION_MATRIX * vec4(SCREEN_UV * 2.0 - 1.0, depth, 1.0);
+	float gap = (-behind.z / behind.w) - (-VERTEX.z);
+	float edge = 1.0 - clamp(gap / edge_foam_width, 0.0, 1.0);
+	edge = smoothstep(0.35, 0.9, edge) * clamp(1.0 - linear_dist / 250.0, 0.0, 1.0);
+	foam_mix_factor = max(foam_mix_factor, edge * 0.85);
+	ALBEDO = mix(water_color, mix(texture(foam_texture, world_vertex.xz * uv_scale).rgb, edge_foam_color.rgb, edge), foam_mix_factor);
 	foam_specular_factor = (1.0 - foam_mix_factor);
 	
 	// Distance Fade

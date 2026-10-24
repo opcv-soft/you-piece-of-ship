@@ -12,6 +12,7 @@ const OCEAN_MATERIAL := preload("res://addons/tessarakkt.oceanfft/Ocean.tres")
 @export var time_scale := 1.0
 
 var ocean: Resource ## Ocean3D
+var ship: Node3D ## for the hull mask (no water inside the ship)
 var _tree: Node3D ## QuadTree3D
 
 
@@ -47,6 +48,11 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	ocean.simulate(delta)
+	if ship:
+		var fwd := ship.global_basis.x
+		var flat := Vector2(fwd.x, fwd.z).normalized()
+		ocean.material.set_shader_parameter("hull_center", ship.global_position)
+		ocean.material.set_shader_parameter("hull_forward", flat)
 
 
 ## Height of the sea surface at a world point (metres; 0 = calm sea level).

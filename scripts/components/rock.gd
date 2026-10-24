@@ -83,8 +83,10 @@ func _paint() -> void:
 	_model.rotation.y = fmod(home.x * 1.7 + home.z, TAU)
 	add_child(_model)
 	if kind == "rock":
-		_model.position.y = -0.55 # just under the surface: the foam ring gives it away only up close
+		_model.position.y = -0.55 # just under the surface until it comes into view
 		_model.visible = revealed
+	elif kind == "wreck" or kind == "siren" or kind == "barrel":
+		_model.position.y = 0.6 if kind == "wreck" else 0.3 # sitting proud of the waves, easy to read
 	elif kind == "whale":
 		_model.rotation.y = 0.0
 		_tail = (load(MODELS + "whale_tail.glb") as PackedScene).instantiate()
@@ -107,7 +109,7 @@ func reveal() -> void:
 	if _model:
 		_model.visible = true
 		var rise := create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-		rise.tween_property(_model, "position:y", -0.15, 0.4)
+		rise.tween_property(_model, "position:y", 0.25, 0.4) # stands clear of the wave crests
 	else:
 		$Mesh.visible = true
 
