@@ -15,6 +15,7 @@ const VoyagePirates = preload("res://scripts/levels/voyage/voyage_pirates.gd")
 const VoyageArrival = preload("res://scripts/levels/voyage/voyage_arrival.gd")
 const InteractionPrompts = preload("res://scripts/ui/interaction_prompts.gd")
 const VoyageCountdown = preload("res://scripts/levels/voyage/voyage_countdown.gd")
+const WaterStreaks = preload("res://scripts/components/water_streaks.gd")
 const Upgrades = preload("res://scripts/systems/upgrades.gd")
 const AICrew = preload("res://scripts/ai/ai_crew.gd")
 const PlayerControls = preload("res://scripts/systems/player_controls.gd")
@@ -100,6 +101,9 @@ func _ready() -> void:
 	results.map_pressed.connect(_back_to_map)
 	results.change_crew_pressed.connect(_change_crew)
 	add_child(InteractionPrompts.new())
+	var streaks := WaterStreaks.new()
+	streaks.ship = _ship
+	add_child(streaks)
 	var pause := PauseMenu.new()
 	pause.name = "PauseMenu"
 	pause.voyage = self

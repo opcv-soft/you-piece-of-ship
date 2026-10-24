@@ -19,7 +19,7 @@ Every script starts with a `##` line saying what it does; `grep -m1 "^##" path` 
 - `scripts/ai/` — AI crewmates: `ai_crew.gd` (one AI's body: moving, pressing, picking a job), `crew_brain.gd` (shared brain, who takes which station). One script per job in `scripts/ai/jobs/`: `ai_steering` (helm, pump, engine, autopilot), `ai_navigator` (callouts, bearings), `ai_carpenter` (leaks, pipe, fetch and bring), `ai_idle` (idle work, fishing, cargo), `ai_gunner` (cannons).
 - `scripts/components/` — one small node per job:
   - Ship systems: `hull_system` + `breach` (leaks), `engine_system` + `engine_station` + `coal_pile` + `engine_gauge` + `engine_heat_visual`, `rudder_system`, `load_system` + `cargo_bay`, `repair_station` (cooling pipe).
-  - Sailing and sea: `ship_handling` (speed/steering), `wave_motion` (rocking; rides the FFT sea's heights), `sea` (painted sea; switches to `fft_sea`, the FFT ocean add-on in `addons/tessarakkt.oceanfft/`), `ship_wake`, `shared_camera`.
+  - Sailing and sea: `ship_handling` (speed/steering), `wave_motion` (rocking; rides the FFT sea's heights), `sea` (painted sea; switches to `fft_sea`, the FFT ocean add-on in `addons/tessarakkt.oceanfft/`), `ship_wake`, `water_streaks` (speed streaks), `shared_camera`.
   - Stations: `station` (base), `helm_station`, `lookout_station` (crow's nest, replaces the map table), `telescope_station` (fog), `map_chart` (the lookout's chart HUD).
   - Things to carry or hit: `item`, `item_dispenser`, `overboard_rail`, `rock` (+ `breakable`: health, loot burst), `loot`, `cannon`, `cannon_projectile` (+ `hit_fx`), `enemy_ship`, `fishing_spot`.
   - Deck chaos: `coal_smears` (spills, sooty footprints), `cargo_chaos` (chests snap loose, burst, gold overboard).
