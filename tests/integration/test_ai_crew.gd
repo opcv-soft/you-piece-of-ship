@@ -114,7 +114,7 @@ func test_given_navigator_and_rock_ahead_then_calls_it_out() -> void:
 	rock.global_position = _ship.to_global(Vector3(45, 0, 12))
 	rock.global_position.y = 0.0
 	await wait_seconds(6.0)
-	assert_string_contains(_crew[3].bubble.text, "fathoms", "a shout bubble above the navigator, in sailor's units")
+	assert_string_contains(_crew[3].bubble.text, "length", "a shout bubble above the navigator, in sailor's units")
 	assert_eq(_crew[3].bubble.style, "shout")
 	assert_true(_ship.get_node("Lookout").is_up(), "up in the crow's nest")
 

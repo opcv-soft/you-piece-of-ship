@@ -8,6 +8,7 @@ const CrewSprite = preload("res://scripts/components/crew_sprite.gd")
 const CrewModel = preload("res://scripts/components/crew_model.gd")
 const DEFAULT_HATS := ["tricorn", "bandana", "beanie", "straw"]
 const ThoughtBubble = preload("res://scripts/components/thought_bubble.gd")
+const CrewBadge = preload("res://scripts/components/crew_badge.gd")
 
 signal jumped
 signal landed
@@ -62,8 +63,9 @@ func _ready() -> void:
 		_use_pixel_art()
 		$Label.position.y = 3.05 # above the taller pixel pirate
 	bubble = ThoughtBubble.new()
-	bubble.height = $Label.position.y + 0.45
+	bubble.height = $Label.position.y + 1.0 # clear of the job icon and P-tag
 	add_child(bubble)
+	add_child(CrewBadge.new()) # colour ring, job icon, big P-tag
 
 
 ## Shows a thought ("think") or a callout ("shout") bubble above this crew member.

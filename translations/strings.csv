@@ -331,7 +331,17 @@ Gunner,Gunner,Canonnier
 "%s, %s, %s!","%s, %s, %s!","%s, %s, %s !"
 "Siren, %s! Don't listen!","Siren, %s! Don't listen!","Sirène, %s ! N'écoutez pas !"
 Land ho! %s dead ahead!,Land ho! %s dead ahead!,Terre ! %s droit devant !
-%d fathoms,%d fathoms,%d brasses
+half a length,half a length,une demi-longueur
+Steering,Steering,Barre
+Stoking,Stoking,Chauffe
+Pumping,Pumping,Pompe
+Lookout,Lookout,Vigie
+Repairs,Repairs,Réparations
+Cannons,Cannons,Canons
+Fishing,Fishing,Pêche
+Free,Free,Libre
+1 length,1 length,1 longueur
+%d lengths,%d lengths,%d longueurs
 %.1f cables,%.1f cables,%.1f encablures
 dead ahead,dead ahead,droit devant
 dead astern,dead astern,droit derrière

@@ -105,10 +105,16 @@ func test_contextual_prompt_shows_only_for_what_a_player_is_near() -> void:
 	assert_string_contains(prompts.text_for(_helm, _crew[0]), "steer", "the prompt says what Use does")
 
 
-func test_a_sailor_working_a_station_fades() -> void:
+func test_an_ai_sailor_working_a_station_fades_but_a_human_never_does() -> void:
 	await _walk_to(_crew[0], _helm)
 	_crew[0].use_requested = true
 	await wait_physics_frames(3)
 	var sailor := _crew[0].get_node_or_null("Visual/Sailor")
 	if sailor:
-		assert_true(sailor._faded, "see-through while steering")
+		assert_false(sailor._faded, "a human stays solid: you never lose yourself")
+		var ai := Node.new()
+		ai.name = "AICrew" # stands in for an AI crewmate at the same station
+		_crew[0].add_child(ai)
+		await wait_physics_frames(2)
+		assert_true(sailor._faded, "an AI crewmate turns see-through while steering")
+		ai.free()

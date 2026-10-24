@@ -91,10 +91,19 @@ static func nautical_bearing(along: float, across: float) -> String:
 	return "dead astern"
 
 
-## Distance in sailor's units: fathoms (1.83 m) up close, cables (185 m) further out.
+## Distance in ship-lengths up close (our ship is about 25 m), cables (185 m) further out. Fathoms
+## measure depth, which confused players (Claude's playtest, 2026-10-24).
+const SHIP_LENGTH := 25.0
+
+
 static func nautical_distance(metres: float) -> String:
 	if metres < 185.0:
-		return TranslationServer.translate("%d fathoms") % maxi(1, roundi(metres / 1.83))
+		var lengths := roundi(metres / SHIP_LENGTH)
+		if lengths < 1:
+			return TranslationServer.translate("half a length")
+		if lengths == 1:
+			return TranslationServer.translate("1 length")
+		return TranslationServer.translate("%d lengths") % lengths
 	return TranslationServer.translate("%.1f cables") % (metres / 185.2)
 
 

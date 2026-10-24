@@ -196,7 +196,8 @@ FR = {
     "Gunner": "Canonnier",
     # Nautical callouts and the helm
     "%.1f knots": "%.1f nœuds", "%s, %s, %s!": "%s, %s, %s !", "Siren, %s! Don't listen!": "Sirène, %s ! N'écoutez pas !",
-    "Land ho! %s dead ahead!": "Terre ! %s droit devant !", "%d fathoms": "%d brasses", "%.1f cables": "%.1f encablures",
+    "Land ho! %s dead ahead!": "Terre ! %s droit devant !", "half a length": "une demi-longueur", "Steering": "Barre", "Stoking": "Chauffe", "Pumping": "Pompe",
+    "Lookout": "Vigie", "Repairs": "Réparations", "Cargo": "Cargaison", "Cannons": "Canons", "Fishing": "Pêche", "Free": "Libre", "1 length": "1 longueur", "%d lengths": "%d longueurs", "%.1f cables": "%.1f encablures",
     "dead ahead": "droit devant", "dead astern": "droit derrière",
     "off the starboard bow": "par tribord avant", "off the port bow": "par bâbord avant",
     "on the starboard beam": "par le travers tribord", "on the port beam": "par le travers bâbord",
