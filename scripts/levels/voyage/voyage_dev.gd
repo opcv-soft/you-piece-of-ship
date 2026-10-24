@@ -52,10 +52,16 @@ func dev_event(event: String) -> bool:
 					crate.velocity = Vector2(0.0, 3.0)
 					cargo.crate_loose.emit(crate)
 					break
+		"approach_port":
+			if voyage.test_drive:
+				return false
+			ship.position.x = voyage.finish_x - 50.0 # just off the beach: watch her slide in
+			voyage._handling.speed = voyage._handling.max_speed * 0.8
 		"reach_port":
 			if voyage.test_drive:
 				return false # an endless sea has no port
 			ship.position.x = voyage.finish_x + 1.0
+			voyage._finish() # straight to the results (a real arrival slides up the beach first)
 		"sink":
 			var hull: Node = voyage.get_node("Ship/HullSystem")
 			hull.sink_grace_seconds = 0.0
@@ -84,7 +90,8 @@ func dev_event(event: String) -> bool:
 func dev_extra_events() -> Array:
 	return [["show_collisions", "Show collision shapes"], ["spawn_enemy_port", "Spawn: pirates (port)"], ["spawn_enemy_starboard", "Spawn: pirates (starboard)"],
 			["spawn_rock", "Spawn: reef rock"], ["spawn_wreck", "Spawn: shipwreck"], ["spawn_whale", "Spawn: whale"],
-			["spawn_siren", "Spawn: siren"], ["spawn_atoll", "Spawn: atoll"], ["spawn_barrel", "Spawn: barrel"]]
+			["spawn_siren", "Spawn: siren"], ["spawn_atoll", "Spawn: atoll"], ["spawn_barrel", "Spawn: barrel"],
+			["approach_port", "Sail to the beach"]]
 
 
 ## Developer "Test Drive": clears every obstacle, pirate, scripted event and wave, removes the port

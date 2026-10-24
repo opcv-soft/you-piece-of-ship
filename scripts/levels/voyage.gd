@@ -12,6 +12,7 @@ const VoyageDev = preload("res://scripts/levels/voyage/voyage_dev.gd")
 const VoyageSky = preload("res://scripts/levels/voyage/voyage_sky.gd")
 const VoyageRoute = preload("res://scripts/levels/voyage/voyage_route.gd")
 const VoyagePirates = preload("res://scripts/levels/voyage/voyage_pirates.gd")
+const VoyageArrival = preload("res://scripts/levels/voyage/voyage_arrival.gd")
 const Upgrades = preload("res://scripts/systems/upgrades.gd")
 const AICrew = preload("res://scripts/ai/ai_crew.gd")
 const PlayerControls = preload("res://scripts/systems/player_controls.gd")
@@ -43,6 +44,7 @@ var _dev := VoyageDev.new(self) ## Developer mode
 var _sky := VoyageSky.new(self) ## sky, fog, storm
 var _route := VoyageRoute.new(self) ## rocks, cliffs, port
 var _pirates := VoyagePirates.new(self)
+var _arrival := VoyageArrival.new(self) ## the pirate village and beaching the ship
 
 @onready var _ship: Node3D = $Ship
 @onready var _handling: Node = $Ship/ShipHandling
@@ -195,8 +197,11 @@ func _physics_process(delta: float) -> void:
 		_run_events()
 		_pirates.run_enemies()
 		elapsed += delta
-		if _ship.global_position.x >= finish_x:
-			_finish()
+		if _arrival.beaching:
+			if _arrival.step(delta):
+				_finish()
+		elif _ship.global_position.x >= finish_x:
+			_arrival.start() # the bow meets the beach: slide up the sand, then the results
 
 
 static func _clock(seconds: float) -> String:

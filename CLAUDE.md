@@ -13,7 +13,7 @@ Non-developer: Claude runs every command, uses plain language, and gives click-b
 
 ## Code map
 Every script starts with a `##` line saying what it does; `grep -m1 "^##" path` is a cheap way to check one.
-- `scripts/levels/voyage.gd` — one voyage: setup, the clock, crew/AI takeovers, contract events, hints, results. Helpers in `scripts/levels/voyage/`: `voyage_route` (rocks, cliffs, port, dev spawns), `voyage_sky` (sky, fog, storm, lightning), `voyage_pirates` (enemy ships, cannonball hits), `voyage_dev` (Developer mode, Test Drive, collision view).
+- `scripts/levels/voyage.gd` — one voyage: setup, the clock, crew/AI takeovers, contract events, hints, results. Helpers in `scripts/levels/voyage/`: `voyage_route` (rocks, cliffs, port, dev spawns), `voyage_sky` (sky, fog, storm, lightning), `voyage_pirates` (enemy ships, cannonball hits), `voyage_dev` (Developer mode, Test Drive, collision view), `voyage_arrival` (the pirate village beach and beaching the ship).
 - `scripts/ship.gd` — the ship; everything on board is its child. Scene: `scenes/greybox/ship.tscn`.
 - `scripts/crew_player.gd` — one crew member: walk, jump, carry, use. Controls: `scripts/components/player_input.gd`, `scripts/systems/player_controls.gd`.
 - `scripts/ai/` — AI crewmates: `ai_crew.gd` (one AI's body: moving, pressing, picking a job), `crew_brain.gd` (shared brain, who takes which station). One script per job in `scripts/ai/jobs/`: `ai_steering` (helm, pump, engine, autopilot), `ai_navigator` (callouts, bearings), `ai_carpenter` (leaks, pipe, fetch and bring), `ai_idle` (idle work, fishing, cargo), `ai_gunner` (cannons).

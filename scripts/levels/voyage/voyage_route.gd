@@ -79,14 +79,7 @@ func _build_port() -> void:
 	yellow.albedo_color = Color(1, 0.85, 0.2)
 	buoy_mesh.material = yellow
 	if Toon.painted:
-		for side in [-1.0, 1.0]:
-			var buoy: Node3D = voyage._ship.prop("buoy", "Buoy%s" % ("Port" if side < 0.0 else "Starboard"))
-			buoy.position = Vector3(finish_x, 0.0, side * 12.0)
-			buoy.add_to_group("finish")
-			voyage.add_child(buoy)
-		var harbour: Node3D = voyage._ship.prop("port", "Dock")
-		harbour.position = Vector3(finish_x + 30.0, 0.0, 0.0)
-		voyage.add_child(harbour)
+		voyage._arrival.build_village() # a beach and a pirate village (scripts/levels/voyage/voyage_arrival.gd)
 		return
 	for side in [-1.0, 1.0]:
 		var buoy := MeshInstance3D.new()
