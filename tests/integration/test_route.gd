@@ -38,8 +38,8 @@ func test_given_reef_run_then_rocks_hidden_cliffs_visible_port_at_end() -> void:
 	assert_eq(others, contract.obstacles.size(), "the wreck, whale and atoll are on the route")
 	assert_eq(hidden, expected)
 	assert_gt(cliffs, 100)
-	for buoy in _level.get_tree().get_nodes_in_group("finish"):
-		assert_almost_eq(buoy.position.x, contract.length, 0.01)
+	for mark in _level.get_tree().get_nodes_in_group("finish"):
+		assert_almost_eq(mark.position.x, contract.length + _level._arrival.VILLAGE_OFFSET, 0.01, "the beach's waterline")
 
 
 func _seen(rock: Node3D) -> bool:
@@ -83,3 +83,16 @@ func test_given_ship_sails_into_coast_then_crashes() -> void:
 	handling.speed = 4.0
 	await wait_seconds(3.0)
 	assert_signal_emitted(handling, "rock_hit")
+
+
+func test_arriving_the_ship_slides_up_the_beach_then_the_results_show() -> void:
+	assert_not_null(_level.get_node_or_null("Village"), "a pirate village instead of a harbour")
+	var ship: Node3D = _level.get_node("Ship")
+	ship.position.x = _level.finish_x + 0.5
+	_level.get_node("Ship/ShipHandling").speed = 5.0
+	await wait_physics_frames(3)
+	assert_true(_level._arrival.beaching, "beaching")
+	assert_false(_level.finished, "not over yet: still sliding up the sand")
+	await wait_seconds(_level._arrival.beaching_seconds + 0.3)
+	assert_true(_level.finished)
+	assert_almost_eq(_level.get_node("Ship/ShipHandling").speed, 0.0, 0.2, "settled on the sand")

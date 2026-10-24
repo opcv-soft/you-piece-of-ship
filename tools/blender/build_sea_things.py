@@ -229,7 +229,84 @@ def barrel():
     return p
 
 
+def village():
+    """The pirate village at the end of a voyage: a sandy beach rising out of the sea (the
+    waterline is at x = 0, the sand climbs toward +x), ramshackle huts on stilts with patched roofs,
+    palms, rowboats pulled up the sand, crates and barrels, a campfire and a Jolly Roger."""
+    random.seed(33)
+    p = []
+    # The beach: a gently rising grid, falling away into the sea at its ends.
+    nx, nz = 24, 36
+    verts, faces = [], []
+    for i in range(nx + 1):
+        x = -12 + i * 64 / nx
+        for j in range(nz + 1):
+            z = -80 + j * 160 / nz
+            rise = -2.2 + 4.6 * min(1.0, max(0.0, (x + 6) / 40.0)) ** 0.8
+            edge = max(0.0, (abs(z) - 55) / 25.0)
+            y = rise - edge * 4.0 + math.sin(x * 0.3 + z * 0.2) * 0.12
+            verts.append((x, y, z))
+    for i in range(nx):
+        for j in range(nz):
+            a = i * (nz + 1) + j
+            faces.append((a, a + 1, a + nz + 2, a + nz + 1))
+    sand = kit.mesh_from("Beach", verts, faces, "sand")
+    p.append(sand)
+    for k in range(9):  # grass tufts higher up
+        x, z = random.uniform(24, 46), random.uniform(-45, 45)
+        p.append(kit.sphere("Grass%d" % k, (x, 1.9, z), random.uniform(1.2, 2.2), "moss", scale=(1.4, 0.25, 1.0)))
+    roofs = ["paint_red", "paint_teal", "sail", "wood_dark", "flag"]
+    for h in range(6):
+        x = random.uniform(26, 40)
+        z = -40 + h * 16 + random.uniform(-3, 3)
+        tilt = random.uniform(-0.12, 0.12)
+        w, d = random.uniform(5, 7), random.uniform(4.5, 6)
+        for sx in (-1, 1):
+            for sz in (-1, 1):
+                p.append(kit.cylinder("Stilt%d%d%d" % (h, sx, sz), (x + sx * w * 0.4, 0.8, z + sz * d * 0.4),
+                                      (x + sx * w * 0.4, 2.6, z + sz * d * 0.4), 0.18, mat="wood_dark", verts=6))
+        p.append(kit.box("Hut%d" % h, (x, 4.0, z), (w, 2.8, d), "wood_hull" if h % 2 else "wood_light", bevel=0.15,
+                         rot=(tilt, random.uniform(-0.3, 0.3), tilt * 0.5)))
+        p.append(kit.box("Roof%d" % h, (x, 5.75, z), (w + 1.2, 0.35, d + 1.2), roofs[h % len(roofs)], bevel=0.1,
+                         rot=(tilt * 2, random.uniform(-0.3, 0.3), 0.18)))
+        p.append(kit.box("Patch%d" % h, (x + 0.8, 5.98, z - 0.6), (1.4, 0.1, 1.2), roofs[(h + 2) % len(roofs)], bevel=0.02,
+                         rot=(0.05, 0.4, 0.2)))
+        p.append(kit.box("Door%d" % h, (x - w * 0.5 - 0.03, 3.6, z), (0.1, 1.8, 1.1), "eye", bevel=0.03))
+        p.append(kit.box("Plank%d" % h, (x - w * 0.5 - 1.6, 1.9, z), (3.2, 0.12, 0.9), "wood_light", bevel=0.02,
+                         rot=(0, 0, -0.35)))
+    for k in range(7):
+        a = random.uniform(-60, 60)
+        p += palm("VPalm%d" % k, (random.uniform(18, 46), 1.2, a), random.uniform(4.0, 6.0), random.uniform(0, 6.28))
+    for b in range(3):  # rowboats pulled up the beach
+        z = random.uniform(-30, 30)
+        p.append(kit.sphere("Rowboat%d" % b, (random.uniform(6, 12), 0.6, z), 1.6, "paint_teal" if b % 2 else "wood_hull",
+                            scale=(1.9, 0.45, 0.8)))
+    for c in range(8):
+        x, z = random.uniform(14, 26), random.uniform(-25, 25)
+        if c % 2:
+            p.append(kit.box("VCrate%d" % c, (x, 1.6, z), (1.1, 1.1, 1.1), "wood_hull", bevel=0.08,
+                             rot=(0, random.uniform(0, 1.5), 0)))
+        else:
+            p.append(kit.cylinder("VBarrel%d" % c, (x, 1.0, z), (x, 2.2, z), 0.55, 0.5, "wood_light", verts=14))
+    # Campfire (fire is allowed in the 1700s) with rocks around it.
+    fx, fz = 20.0, 4.0
+    for k in range(8):
+        a = k * math.pi / 4
+        p.append(kit.sphere("FireStone%d" % k, (fx + math.cos(a) * 1.3, 1.4, fz + math.sin(a) * 1.3), 0.35, "rock"))
+    for k in range(3):
+        p.append(kit.cylinder("Log%d" % k, (fx - 0.8, 1.4, fz - 0.6 + k * 0.6), (fx + 0.8, 1.6, fz + 0.6 - k * 0.6), 0.15,
+                              mat="wood_dark", verts=6))
+    p.append(kit.sphere("Flames", (fx, 1.9, fz), 0.55, "glow", scale=(0.8, 1.4, 0.8)))
+    # The Jolly Roger.
+    p.append(kit.cylinder("FlagPole", (30, 2.0, -6), (30, 11, -6), 0.12, mat="wood_dark", verts=8))
+    p.append(kit.mesh_from("JollyRoger", [(30, 11, -6), (30, 9, -6), (27, 10.2, -6.2), (27, 11.4, -6.1)], [(0, 1, 2, 3)],
+                           "eye", smooth=False))
+    p.append(kit.sphere("Skull", (28.4, 10.3, -6.25), 0.35, "white", scale=(1, 1, 0.3)))
+    return p
+
+
 THINGS = {
+    "village": village,
     "barrel": barrel,
     "port": port,
     "rock": rock, "cliff": cliff, "wreck": wreck, "whale": whale, "whale_tail": whale_tail, "siren": siren,
