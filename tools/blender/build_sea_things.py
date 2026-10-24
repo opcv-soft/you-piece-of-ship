@@ -217,7 +217,20 @@ def port():
     return p
 
 
+def barrel():
+    """A floating cask (radius about 0.8): a cannon target that bursts into loot."""
+    p = [kit.cylinder("Cask", (0, -0.5, 0), (0, 0.7, 0), 0.62, 0.55, "wood_hull", verts=18)]
+    for y in (-0.25, 0.45):
+        p.append(kit.torus("CaskHoop%.0f" % (y * 100), (0, y, 0), 0.6, 0.05, "iron"))
+    p.append(kit.cylinder("CaskStripe", (0, 0.05, 0), (0, 0.2, 0), 0.63, 0.63, "paint_red", verts=18))
+    p.append(kit.cylinder("CaskLid", (0, 0.7, 0), (0, 0.74, 0), 0.5, mat="wood_light", verts=18))
+    p.append(kit.cylinder("CaskFlagPole", (0.2, 0.74, 0), (0.2, 1.6, 0), 0.03, mat="wood_dark", verts=6))
+    p.append(kit.mesh_from("CaskFlag", [(0.2, 1.6, 0), (0.2, 1.25, 0), (0.7, 1.42, 0)], [(0, 1, 2)], "gold", smooth=False))
+    return p
+
+
 THINGS = {
+    "barrel": barrel,
     "port": port,
     "rock": rock, "cliff": cliff, "wreck": wreck, "whale": whale, "whale_tail": whale_tail, "siren": siren,
     "atoll": atoll, "fish_sardine": lambda: fish("sardine"), "fish_goldfish": lambda: fish("goldfish"),

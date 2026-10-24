@@ -38,6 +38,14 @@ func _physics_process(delta: float) -> void:
 
 func _land() -> void:
 	var hit: Node3D = null
+	for obstacle in get_tree().get_nodes_in_group("rocks"):
+		if obstacle.has_method("take_hit") and obstacle.has_node("Breakable"):
+			var gap := Vector2(obstacle.global_position.x - target.x, obstacle.global_position.z - target.z).length()
+			if gap < obstacle.radius + 1.0:
+				obstacle.take_hit(target)
+				landed.emit(target, obstacle)
+				queue_free()
+				return
 	for enemy in get_tree().get_nodes_in_group("enemy_ships"):
 		if enemy != shooter and enemy.has_method("contains") and enemy.contains(target):
 			hit = enemy

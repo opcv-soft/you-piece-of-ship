@@ -32,7 +32,7 @@ func test_given_reef_run_then_rocks_hidden_cliffs_visible_port_at_end() -> void:
 			cliffs += 1
 			assert_true(_seen(rock))
 			assert_gt(absf(rock.position.z), contract.coast_half_width, "cliffs line the channel")
-		else:
+		elif rock.kind != "barrel": # floating barrels are cannon targets, not route obstacles
 			others += 1
 			assert_true(_seen(rock), "%s (%s) is in plain sight" % [rock.name, rock.kind])
 	assert_eq(others, contract.obstacles.size(), "the wreck, whale and atoll are on the route")

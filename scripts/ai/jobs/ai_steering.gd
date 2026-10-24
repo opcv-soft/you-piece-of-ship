@@ -118,7 +118,7 @@ func known_rocks() -> Array:
 	var sight := chart_range()
 	var known := []
 	for rock in ai.get_tree().get_nodes_in_group("rocks"):
-		if is_cliff(rock):
+		if is_cliff(rock) or (rock.has_method("is_soft") and rock.is_soft()):
 			continue # cliffs: the lane stays inside the channel instead
 		if not rock.hidden:
 			known.append(rock) # wrecks, whales, sirens, atolls: everyone can see them

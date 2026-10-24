@@ -29,6 +29,7 @@ var impact_speed := 0.0 ## speed just before the last rock hit
 var throttle := 0.0 ## -max_reverse..1 (negative = astern)
 var rudder := 0.0 ## -1 = full starboard (right), +1 = full port (left)
 var lures := {} ## sirens pulling the wheel: id -> pull (-1..1), added to the rudder
+var drifts := {} ## sirens dragging the ship: id -> world velocity (m/s), added to its motion
 var speed := 0.0
 
 var _ship: Node3D
@@ -107,6 +108,8 @@ func step(delta: float) -> void:
 		var wheel := clampf(rudder + rudder_offset + pull, -1.0, 1.0)
 		_ship.rotation.y += deg_to_rad(turn_rate_degrees) * wheel * turn_factor_now * delta
 	_ship.position += forward() * speed * delta
+	for drift in drifts.values():
+		_ship.position += drift * delta
 	_cooldown = maxf(0.0, _cooldown - delta)
 	if _cooldown == 0.0:
 		_check_rocks()
@@ -122,6 +125,9 @@ func _check_rocks() -> void:
 		if offset.length() > rock.radius + 16.0:
 			continue
 		if touches_hull(Vector2(offset.dot(fwd), offset.dot(right)), rock.radius):
+			if rock.has_method("is_soft") and rock.is_soft():
+				rock.take_hit(rock.global_position, 99) # a floating barrel just bursts
+				continue
 			_hit(rock)
 			return
 
@@ -187,3 +193,6 @@ func _hit(rock: Node3D) -> void:
 	rock.reveal()
 	impact.emit(rock)
 	rock_hit.emit(rock)
+	# A hard ram chips at breakable things too (hard enough: 40% of top speed or more).
+	if impact_strength() >= 0.4 and rock.has_method("take_hit"):
+		rock.take_hit(rock.global_position, 1 + int(impact_strength() * 1.5))

@@ -73,7 +73,7 @@ func dev_event(event: String) -> bool:
 			toggle_collision_view()
 		"spawn_enemy_port", "spawn_enemy_starboard":
 			voyage.spawn_enemy(-1.0 if event == "spawn_enemy_port" else 1.0)
-		"spawn_rock", "spawn_wreck", "spawn_whale", "spawn_siren", "spawn_atoll":
+		"spawn_rock", "spawn_wreck", "spawn_whale", "spawn_siren", "spawn_atoll", "spawn_barrel":
 			voyage._spawn_ahead(event.trim_prefix("spawn_"))
 		_:
 			return false
@@ -84,7 +84,7 @@ func dev_event(event: String) -> bool:
 func dev_extra_events() -> Array:
 	return [["show_collisions", "Show collision shapes"], ["spawn_enemy_port", "Spawn: pirates (port)"], ["spawn_enemy_starboard", "Spawn: pirates (starboard)"],
 			["spawn_rock", "Spawn: reef rock"], ["spawn_wreck", "Spawn: shipwreck"], ["spawn_whale", "Spawn: whale"],
-			["spawn_siren", "Spawn: siren"], ["spawn_atoll", "Spawn: atoll"]]
+			["spawn_siren", "Spawn: siren"], ["spawn_atoll", "Spawn: atoll"], ["spawn_barrel", "Spawn: barrel"]]
 
 
 ## Developer "Test Drive": clears every obstacle, pirate, scripted event and wave, removes the port

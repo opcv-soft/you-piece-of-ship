@@ -29,7 +29,7 @@ func _ready() -> void:
 	visible = false
 	_viewport = SubViewport.new()
 	_viewport.transparent_bg = true
-	_viewport.size = Vector2i(420, 150)
+	_viewport.size = Vector2i(700, 150)
 	_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
 	add_child(_viewport)
 	_panel = PanelContainer.new()
@@ -71,10 +71,10 @@ func show_text(new_text: String, seconds := 2.5, new_style := "think") -> void:
 	_panel.add_theme_stylebox_override("panel", box)
 	# Fit the bubble to the text, centred, with room for the tail below.
 	var text_size := _label.get_theme_font("font").get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size)
-	var panel_size := Vector2(minf(text_size.x + 52.0, 410.0), text_size.y + 22.0)
+	var panel_size := Vector2(minf(text_size.x + 52.0, 690.0), text_size.y + 22.0)
 	_panel.size = panel_size
-	_panel.position = Vector2((420.0 - panel_size.x) * 0.5, 6.0)
-	_tail.size = Vector2(420, 150)
+	_panel.position = Vector2((700.0 - panel_size.x) * 0.5, 6.0)
+	_tail.size = Vector2(700, 150)
 	_tail.queue_redraw()
 	_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
 	visible = true
@@ -101,7 +101,7 @@ func _draw_tail() -> void:
 	var ink := Color(0.16, 0.11, 0.09)
 	var fill := Color(1.0, 0.86, 0.3) if style == "shout" else Color(1, 1, 1)
 	var bottom := _panel.position.y + _panel.size.y
-	var centre := 210.0
+	var centre := 350.0
 	if style == "think":
 		for dot in [[Vector2(centre - 6, bottom + 16), 11.0], [Vector2(centre - 16, bottom + 40), 7.0]]:
 			_tail.draw_circle(dot[0], dot[1] + 3.0, ink)
