@@ -3,7 +3,7 @@ extends Node3D
 ## disassemble, break into pieces. the debris should float and then get swooshed in the correct
 ## stock pile on the boat"). The pieces pop out, bob on the water a moment, then fly in arcs onto
 ## the ship, each into its own pile: charcoal to the coal pile, planks to the plank box, gold to the
-## bucket, grease to the grease barrels, a siren onto the bowsprit. When the last piece lands the
+## bucket, a whale's blubber and a siren onto the bowsprit kebab. When the last piece lands the
 ## haul goes into ShipStores and the score. Spawned by breakable.gd and enemy_ship.gd.
 
 const Toon = preload("res://scripts/systems/toon.gd")
@@ -16,8 +16,8 @@ const TARGETS := {
 	"coal": Vector3(-8.1, 0.8, 2.6), # the coal pile by the furnace
 	"planks": Vector3(10.0, 1.4, -0.4), # the plank box on the foredeck
 	"gold": ShipStores.BUCKET + Vector3(0, 1.0, 0),
-	"grease": ShipStores.GREASE + Vector3(0, 1.0, 0),
-	"siren": ShipStores.SKEWER_TIP,
+	"grease": ShipStores.BowspritSkewer.TIP, # blubber, onto the bowsprit kebab
+	"siren": ShipStores.BowspritSkewer.TIP,
 }
 ## How many pieces each resource breaks into.
 const PIECES := {"coal": 6, "planks": 5, "gold": 8, "grease": 3, "siren": 1}
@@ -102,7 +102,7 @@ func land_all() -> void:
 	queue_free()
 
 
-## One piece of debris: a charcoal lump, a plank, a gold coin, a grease keg or the siren herself.
+## One piece of debris: a charcoal lump, a plank, a gold coin, a chunk of blubber or the siren herself.
 func _piece() -> Node3D:
 	var piece := MeshInstance3D.new()
 	match resource:
@@ -124,13 +124,11 @@ func _piece() -> Node3D:
 			coin.height = 0.08
 			piece.mesh = coin
 			piece.material_override = Toon.material("gold")
-		"grease":
-			var keg := CylinderMesh.new()
-			keg.top_radius = 0.32
-			keg.bottom_radius = 0.32
-			keg.height = 0.7
-			piece.mesh = keg
-			piece.material_override = Toon.material("wood_light")
+		"grease": # chunks of whale blubber, on their way to the bowsprit kebab
+			var chunk := BoxMesh.new()
+			chunk.size = Vector3(0.6, 0.45, 0.45)
+			piece.mesh = chunk
+			piece.material_override = Toon.material("skin", ShipStores.BowspritSkewer.BLUBBER_PINK)
 		_:
 			var body := SphereMesh.new()
 			body.radius = 0.5

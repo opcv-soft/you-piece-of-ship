@@ -5,7 +5,7 @@
 > Milestones: **Ugly Prototype** (Milestone A, DESIGN.md §9) then **Vertical Slice** (Milestone B)
 
 ## Now (committed, top = highest priority) — Milestone A
-- [standard] Sirens skewered on the bowsprit like shrimp, everything breaks in one shot, easier fishing (1.5x real bites, 3x strike window) (Olivier, 2026-10-25). Branch `hypothesis/p2-siren-mast-fishing` (stacked on the broadside branch); fishing playtested OK; siren and one-shot **need a playtest**.
+- [standard] Bowsprit kebab (sirens like shrimp, whales as blubber blocks), one cannonball breaks anything, the hull breaks nothing, easier fishing (1.5x real bites, 3x strike window) (Olivier, 2026-10-25). Branch `hypothesis/p2-siren-mast-fishing` (stacked on the broadside branch); fishing playtested OK; kebab and one-shot **need a playtest**.
 - [standard] Broadsides you see coming (Olivier, 2026-10-25, first step of "enemy ships that fight"): pirates take aim for 2 s before firing (gun ports open, muzzles run out, fuses spark and hiss), red rings mark where each ball will land, leading a moving ship; balls land exactly there and only hit the deck where they come down; dodge by changing speed or course, step off the rings, or hit them first to spoil the shot (they reload half). Branch `hypothesis/p1-broadside-warning`, built, all 205 tests pass (2026-10-25), **not playtested yet**.
 
 ## Next (likely, not committed)
@@ -18,6 +18,7 @@
 - Enemy AI ships to sink, with cannons (Olivier, 2026-10-22: "eventually there shall be enemy AI ships to sink and we'd have cannons")
 
 ## Parked (good ideas that are out of scope until the core loop is proven)
+- Loadout screen at the start of a voyage: super hull (rams break rocks) and super cannon (Olivier, 2026-10-25: "we'll work on that later")
 - Fire, crew overboard, floating cargo recovery
 - 2-player mode, split screen, mixed couch-plus-online groups
 - Secret objectives, many classes, crafting, campaign, permadeath, cosmetics

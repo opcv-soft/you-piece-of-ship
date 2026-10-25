@@ -203,4 +203,6 @@ Biggest weakness: the skewered siren is unreadable.
 Change: a big siren curled into a C, the mast through her head and tail, banded shrimp-shell tail, crossed-out eyes, drawn over the sail; checked in screenshots (tools/screenshot.gd haul=siren:3).
 Second look (Olivier): circled the bowsprit, "I want the siren here. And it still doesnt work. I shot the siren and I have no shrimp. All the stuff needs to be 100% breakable in one shot." (She took 3 hits, so one shot gave no siren.)
 Change: everything breakable breaks in one shot (same total loot); sirens threaded on the bowsprit, hanging under it like shrimp on a kebab stick; a test fires a real cannonball at a siren.
-Decision: fishing KEPT; siren + one-shot awaiting playtest
+Third note (Olivier): "Pirate ship should take 3 hits. Rocks don't break with the hull unless you load a super hull"; "I want each other loots to go on my bowsprit: sirens like shrimps, whales as whale blubbers" (photo of a block of blubber). Asked: only sirens and whales go on the skewer; coal, planks and gold keep their piles.
+Change: rams never break things; whales become blubber blocks on the bowsprit kebab (bowsprit_skewer.gd); checked in screenshots.
+Decision: fishing KEPT; kebab + one-shot awaiting playtest

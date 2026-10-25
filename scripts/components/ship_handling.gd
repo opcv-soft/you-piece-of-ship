@@ -193,6 +193,7 @@ func _hit(rock: Node3D) -> void:
 	rock.reveal()
 	impact.emit(rock)
 	rock_hit.emit(rock)
-	# A hard ram (40% of top speed or more) damages breakable things; any bump knocks a bit of salvage off.
+	# The hull never breaks things (Olivier, 2026-10-25: "Rocks don't break with the hull", a super hull
+	# from the loadout will, later); any bump still knocks a bit of salvage off.
 	if rock.has_method("take_hit"):
-		rock.take_hit(rock.global_position, 1 + int(impact_strength() * 1.5) if impact_strength() >= 0.4 else 0)
+		rock.take_hit(rock.global_position, 0)

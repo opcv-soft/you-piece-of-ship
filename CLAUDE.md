@@ -22,7 +22,7 @@ Every script starts with a `##` line saying what it does; `grep -m1 "^##" path` 
   - Sailing and sea: `ship_handling` (speed/steering), `wave_motion` (rocking; rides the FFT sea's heights), `sea` (painted sea; switches to `fft_sea`, the FFT ocean add-on in `addons/tessarakkt.oceanfft/`), `ship_wake`, `water_streaks` (speed streaks), `shared_camera`.
   - Stations: `station` (base), `helm_station`, `lookout_station` (crow's nest, replaces the map table), `telescope_station` (fog), `map_chart` (the lookout's chart HUD).
   - Things to carry or hit: `item`, `item_dispenser`, `overboard_rail`, `rock` (+ `breakable`: health, burst into `salvage`: pieces that bob then swoosh into their pile aboard), `loot`, `cannon` (+ `cannon_aim_guide`), `cannon_projectile` (+ `hit_fx`), `enemy_ship` (+ `broadside_warning`: gun ports and red landing rings while pirates aim), `fishing_spot`.
-  - Hauling: `ship_stores` (gold bucket, charcoal, planks, grease, skewered sirens).
+  - Hauling: `ship_stores` (gold bucket, charcoal, planks) + `bowsprit_skewer` (the bowsprit kebab: shrimp sirens, whale blubber blocks).
   - Deck chaos: `coal_smears` (spills, sooty footprints), `cargo_chaos` (chests snap loose, burst, gold overboard).
   - Look and feel: `game_feel` (juice), `crew_badge` (colour ring, job icon, P-tag), `engine_sound`, `adaptive_music`, `thought_bubble`, `crew_model`, `crew_sprite`.
 - `scripts/contracts/` — `contract.gd` (one voyage's data), `contract_library.gd` (all hand-made contracts).

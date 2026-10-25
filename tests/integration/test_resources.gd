@@ -61,7 +61,7 @@ func test_one_cannonball_skewers_the_siren_on_the_bowsprit() -> void:
 	assert_false(siren.is_in_group("rocks"), "one shot breaks her")
 	await _collect_all()
 	assert_eq(_stores.counts.siren, 1)
-	var skewered: Node3D = _stores.get_node_or_null("Siren1")
+	var skewered: Node3D = _stores.get_node_or_null("BowspritSkewer/Siren1")
 	assert_not_null(skewered, "skewered like a shrimp")
 	assert_gt(skewered.position.x, 14.6, "out on the bowsprit, past the bow")
 
@@ -71,6 +71,9 @@ func test_whales_give_all_their_grease_in_one_shot() -> void:
 	assert_true(whale.take_hit(), "one shot")
 	await _collect_all()
 	assert_eq(_stores.counts.grease, 5, "as much grease as the old five hits gave")
+	var blubber: Node3D = _stores.get_node_or_null("BowspritSkewer/Blubber1")
+	assert_not_null(blubber, "a block of blubber on the bowsprit kebab")
+	assert_gt(blubber.position.x, 14.6, "out on the bowsprit, past the bow")
 
 
 func test_debris_floats_then_swooshes_into_its_pile_by_itself() -> void:
@@ -93,6 +96,14 @@ func test_one_cannonball_breaks_a_rock_and_knocks_charcoal_aboard() -> void:
 	assert_false(rock.is_in_group("rocks"), "one shot breaks it")
 	await _collect_all()
 	assert_gt(_stores.counts.coal, 0, "but a lump of charcoal still comes aboard")
+
+
+func test_the_hull_never_breaks_a_rock_even_at_full_speed() -> void:
+	var rock: Node3D = _level._spawn_ahead("rock")
+	var handling: Node = _ship.get_node("ShipHandling")
+	handling.speed = handling.max_speed
+	handling._hit(rock)
+	assert_true(rock.is_in_group("rocks"), "rams don't break things (until a super hull, later)")
 
 
 func test_even_a_gentle_bump_knocks_charcoal_aboard() -> void:
@@ -119,7 +130,7 @@ func test_at_the_beach_the_haul_goes_to_the_village() -> void:
 
 func test_sirens_thread_along_the_bowsprit() -> void:
 	_stores.add("siren", 3)
-	var first: Node3D = _stores.get_node("Siren1")
-	var third: Node3D = _stores.get_node("Siren3")
+	var first: Node3D = _stores.get_node("BowspritSkewer/Siren1")
+	var third: Node3D = _stores.get_node("BowspritSkewer/Siren3")
 	assert_lt(third.position.x, first.position.x, "each new siren goes further in along the pole")
 	assert_gt(third.position.x, 14.6, "all three out over the water")

@@ -18,3 +18,12 @@
     Given a rock, wreck, whale, siren or barrel
     When one cannonball hits it
     Then it breaks and all its loot flies aboard
+
+  Scenario: The hull doesn't break things
+    Given a rock ahead
+    When the ship rams it, even at full speed
+    Then the rock still stands (only a super hull will break it, later)
+
+  Scenario: Whale blubber on the kebab
+    Given the crew shoots a whale
+    Then a block of blubber (pink fat on black skin) is threaded on the bowsprit next to the sirens
