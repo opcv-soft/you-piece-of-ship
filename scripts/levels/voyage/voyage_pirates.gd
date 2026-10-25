@@ -1,10 +1,11 @@
 extends RefCounted
 ## Pirates on a voyage: spawns the contract's enemy ships as the ship sails past their mark, and
-## turns an enemy cannonball landing on deck into a breach. Owned by voyage.gd.
+## turns an enemy cannonball landing on deck into a breach; explains their broadside warning rings. Owned by voyage.gd.
 
 const EnemyShip = preload("res://scripts/components/enemy_ship.gd")
 
 var voyage: Node3D
+var _explained_rings := false ## the first broadside of a voyage explains the red rings
 
 
 func _init(owner_voyage: Node3D) -> void:
@@ -33,9 +34,19 @@ func spawn_enemy(side: float) -> Node3D:
 	enemy.rotation.y = ship.rotation.y
 	enemy.sunk.connect(func(_e): voyage_log.add("Pirates sunk! Their planks fly aboard", "good"); voyage.show_hint(voyage.tr("Pirates sunk! Their planks fly into your plank box.")))
 	enemy.broadside.connect(func(): voyage_log.add("Pirates fired a broadside", "info"))
+	enemy.took_aim.connect(func(): _on_took_aim(voyage_log))
+	enemy.spoiled.connect(func(): voyage_log.add("Hit them first: their broadside is spoiled", "good"); voyage.show_hint(voyage.tr("Hit them first: their broadside is spoiled!")))
 	voyage_log.add("Pirates on the %s side!", "bad", ["starboard" if side > 0.0 else "port"])
 	voyage.show_hint(voyage.tr("PIRATES! Outrun them at full speed, or load the cannons on that side (cannonballs in the middle of the deck)."))
 	return enemy
+
+
+## Pirates are taking aim: the red rings are up. Say what they mean the first time.
+func _on_took_aim(voyage_log: Node) -> void:
+	voyage_log.add("Pirates took aim", "info")
+	if not _explained_rings:
+		_explained_rings = true
+		voyage.show_hint(voyage.tr("They're taking aim! The red rings are where the balls land: sail the deck out of them, step off them, or hit the pirates first."))
 
 
 ## An enemy cannonball landed on the deck: it cracks the hull there, like a rock would.

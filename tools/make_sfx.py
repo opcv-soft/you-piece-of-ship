@@ -1,5 +1,5 @@
 """Sound effects, synthesised from scratch (original, no samples): breaking things, cannons, the
-engine. Run: python3 tools/make_sfx.py -> assets/audio/sfx/*.wav (the engine hum loops)."""
+engine, pirate fuses. Run: python3 tools/make_sfx.py -> assets/audio/sfx/*.wav (the engine hum loops)."""
 import math
 import random
 import struct
@@ -146,9 +146,23 @@ def splash():
     save("splash", [s * e for s, e in zip(lowpass(noise(n), 2800), env(n, 0.01, 0.2))])
 
 
+def fuse_hiss():
+    """Pirates taking aim: two seconds of fizzing fuses that crackle harder toward the shot."""
+    n = int(RATE * 2.0)
+    hiss = [s * (0.35 + 0.65 * i / n) for i, s in enumerate(noise(n))]
+    hiss = [a - b for a, b in zip(hiss, lowpass(hiss, 2500))]  # high-passed: a thin fizz, not a rumble
+    pops = [0.0] * n
+    for _ in range(40):
+        at = int(random.uniform(0.0, 1.0) ** 0.6 * (n - 400))  # more pops near the end
+        for k in range(300):
+            pops[at + k] += random.uniform(-1, 1) * math.exp(-k / 40)
+    fade = [min(1.0, i / (0.05 * RATE), (n - i) / (0.03 * RATE)) for i in range(n)]
+    save("fuse_hiss", [(h + p * 0.6) * f for h, p, f in zip(hiss, pops, fade)], 0.6)
+
+
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
     for make in (rock_crack, wood_splinter, barrel_burst, siren_shriek, whale_moan, cannon_fire, cannon_impact,
-                 engine_start, engine_hum, splash):
+                 engine_start, engine_hum, splash, fuse_hiss):
         make()
     print("sounds made in", OUT)

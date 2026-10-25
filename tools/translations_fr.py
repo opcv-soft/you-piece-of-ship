@@ -247,6 +247,11 @@ FR = {
     "The swell shifted the cargo! Tie the chests back down.": "La houle a déplacé la cargaison ! Rattachez les coffres.",
     "The engine coughed and died! Fix the cooling pipe and get it going again.": "Le moteur a toussé et calé ! Réparez le tuyau et relancez-le.",
     "A wave broke over the bow: the deck is flooding! Pump! Patch!": "Une vague a déferlé sur la proue : le pont est inondé ! Pompez ! Colmatez !",
+    "Pirates took aim": "Les pirates ont visé",
+    "They're taking aim! The red rings are where the balls land: sail the deck out of them, step off them, or hit the pirates first.":
+        "Ils visent ! Les cercles rouges montrent où tombent les boulets : sortez le pont des cercles, écartez-vous, ou touchez les pirates en premier.",
+    "Hit them first: their broadside is spoiled": "Touchés en premier : leur bordée est ratée",
+    "Hit them first: their broadside is spoiled!": "Touchés en premier : leur bordée est ratée !",
     "Sardine": "Sardine", "Goldfish": "Poisson doré", "Squid": "Calamar", "Pufferfish": "Poisson-globe", "Treasure!": "Trésor !",
 }
 

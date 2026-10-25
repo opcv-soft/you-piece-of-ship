@@ -5,8 +5,12 @@
 > Milestones: **Ugly Prototype** (Milestone A, DESIGN.md §9) then **Vertical Slice** (Milestone B)
 
 ## Now (committed, top = highest priority) — Milestone A
+- [standard] Broadsides you see coming (Olivier, 2026-10-25, first step of "enemy ships that fight"): pirates take aim for 2 s before firing (gun ports open, muzzles run out, fuses spark and hiss), red rings mark where each ball will land, leading a moving ship; balls land exactly there and only hit the deck where they come down; dodge by changing speed or course, step off the rings, or hit them first to spoil the shot (they reload half). Branch `hypothesis/p1-broadside-warning`, built, all 205 tests pass (2026-10-25), **not playtested yet**.
 
 ## Next (likely, not committed)
+- Pirates that sail for real (turning circle, jockeying for a broadside angle) — option Olivier didn't pick first on 2026-10-25
+- Different enemy ships (fast cutter, tanky 3-ball galleon, rammer that boards); two pirate ships at once, one on each side
+- AI helmsman and AI crew react to the rings (dodge, step off)
 
 ## Later (deliberately vague)
 - Generated HD art for the menu background, logo and icons (replace the mockup crop); ship sound effects; more pixel-art dressing

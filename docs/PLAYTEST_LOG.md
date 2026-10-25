@@ -187,3 +187,10 @@ Decision: KEPT / REVERTED — why
 - "i only get the loot when i hit the floating barrels, i want to get the loot when i hit everything" → every hit chips salvage aboard.
 - "i want a aim thing that shows me where the cannon trajectory is" → aim guide.
 - "It's hard to read, hard to understand what the other AI are doing" → Claude playtested Maiden Voyage and Reef Run; review sent, top-5 readability changes awaiting Olivier's pick.
+
+## 2026-10-25 — Broadsides you see coming (hypothesis/p1-broadside-warning), awaiting playtest
+Hypothesis: if the crew can see a broadside coming (2 s of gun ports, fuse hiss and red rings where the balls will land), pirate fights become a crew decision (dodge, step aside, shoot first) instead of random damage.
+Try: Esc → Developer → "Spawn: pirates (port)", sail level with them, watch the rings; then try sailing out of them, standing still in them, and hitting them while they aim.
+Observed:
+Biggest weakness:
+Decision: KEPT / REVERTED — why

@@ -19,3 +19,7 @@ Thumbs.db
 
 # Packaged games (shared as zips, not stored in git)
 builds/
+
+# Local test run output (Run Tests.command)
+test_results.txt
+__pycache__/

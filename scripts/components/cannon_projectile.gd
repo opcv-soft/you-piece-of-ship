@@ -1,6 +1,7 @@
 extends Node3D
 ## A cannonball in flight: a high arc from the muzzle to where it lands. On landing it hits the enemy
-## ship (or the player's ship, for enemy shots) if it's there, otherwise it splashes.
+## ship (or the player's ship, for enemy shots) if it's there, otherwise it splashes. Our balls hit
+## anything they fly over; pirate balls hit our ship only where they land (their warning ring).
 
 signal landed(at: Vector3, hit: Node3D)
 
@@ -55,9 +56,8 @@ func _struck_at(point: Vector3) -> Node3D:
 			var gap := Vector2(obstacle.global_position.x - point.x, obstacle.global_position.z - point.z).length()
 			if gap < obstacle.radius + 0.6:
 				return obstacle
-	var ship := get_tree().get_first_node_in_group("player_ship") as Node3D
-	if ship and ship != shooter and shooter and shooter.is_in_group("enemy_ships") and _on_ship(ship, point):
-		return ship
+	# Pirate balls only hit our ship where they come down (in the warning ring), never on the way:
+	# that's what the rings promise (broadside_warning.gd).
 	return null
 
 

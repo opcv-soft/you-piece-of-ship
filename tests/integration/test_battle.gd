@@ -89,7 +89,10 @@ func test_pirates_only_fire_when_alongside() -> void:
 	enemy.global_position = _ship.global_position - right * enemy.stand_off
 	enemy.global_position.y = 0.0
 	await wait_physics_frames(2)
-	assert_signal_emitted(enemy, "broadside", "level with us: broadside")
+	assert_signal_emitted(enemy, "took_aim", "level with us: they take aim")
+	assert_signal_not_emitted(enemy, "broadside", "but give us a moment to see it coming")
+	await wait_seconds(enemy.warning_seconds + 0.1)
+	assert_signal_emitted(enemy, "broadside", "then the broadside")
 
 
 func test_outrunning_them_makes_them_give_up() -> void:
@@ -181,3 +184,99 @@ func test_every_hit_on_a_pirate_knocks_a_plank_aboard() -> void:
 	enemy.take_hit(enemy.global_position)
 	await wait_physics_frames(2)
 	assert_eq(get_tree().get_nodes_in_group("salvage").size(), 1, "a plank flies off on the first hit")
+
+
+## Pirates level with us, guns loaded, nothing in the way: they take aim on the next frame.
+func _pirates_alongside(side := -1.0) -> Node3D:
+	var enemy: Node3D = _level.spawn_enemy(side)
+	enemy.accuracy = 1.0 # every ball aimed at the deck, so the rings are on it
+	enemy.reload_left = 0.0
+	enemy.global_position = _ship.global_position + _ship.global_basis.z * side * enemy.stand_off
+	enemy.global_position.y = 0.0
+	return enemy
+
+
+func _cracked() -> int:
+	var cracked := 0
+	for breach in _ship.get_node("HullSystem").breaches():
+		if breach.state != 0:
+			cracked += 1
+	return cracked
+
+
+func test_taking_aim_opens_gun_ports_and_rings_mark_the_landing_spots() -> void:
+	var enemy := _pirates_alongside()
+	var warning: Node3D = enemy.get_node("BroadsideWarning")
+	assert_false(warning.showing(), "nothing to see while they reload")
+	await wait_physics_frames(2)
+	assert_true(enemy.aiming)
+	assert_true(warning.showing(), "gun ports open, rings on our deck")
+	assert_eq(warning.rings().size(), enemy.balls_per_broadside, "one ring per ball")
+	for ring in warning.rings():
+		assert_true(ring.visible)
+
+
+func test_the_balls_land_in_the_rings() -> void:
+	var enemy := _pirates_alongside()
+	await wait_physics_frames(2)
+	var spots: Array = enemy.warning_points()
+	var landed := []
+	enemy.broadside.connect(func():
+		for ball in get_tree().get_nodes_in_group("enemy_cannonballs"):
+			landed.append(ball.target))
+	await wait_seconds(enemy.warning_seconds + 0.1)
+	assert_eq(landed.size(), spots.size(), "a ball for every ring")
+	for i in spots.size():
+		assert_almost_eq(Vector2(landed[i].x, landed[i].z), Vector2(spots[i].x, spots[i].z), Vector2(0.01, 0.01))
+	assert_false(enemy.get_node("BroadsideWarning").showing(), "rings gone once they've fired")
+
+
+func test_standing_still_in_the_rings_gets_us_hit() -> void:
+	var enemy := _pirates_alongside()
+	await wait_physics_frames(2)
+	assert_true(enemy.aiming)
+	await wait_seconds(enemy.warning_seconds + 1.6)
+	assert_gt(_cracked(), 0, "the deck was in the rings: the hull cracks")
+
+
+func test_sailing_out_of_the_rings_dodges_the_broadside() -> void:
+	var enemy := _pirates_alongside()
+	await wait_physics_frames(2)
+	assert_true(enemy.aiming)
+	_ship.global_position += _ship.global_basis.x * 30.0 # full ahead: the deck leaves the rings
+	await wait_seconds(enemy.warning_seconds + 1.6)
+	assert_eq(_cracked(), 0, "the balls splash into the sea behind us")
+
+
+func test_they_aim_where_we_will_be_not_where_we_are() -> void:
+	var handling := _ship.get_node("ShipHandling")
+	handling.speed = handling.max_speed * 0.6
+	var enemy := _pirates_alongside()
+	enemy.balls_per_broadside = 3
+	await wait_physics_frames(2)
+	var ahead := 0.0
+	for spot in enemy.warning_points():
+		ahead += (spot - _ship.global_position).dot(handling.forward())
+	assert_gt(ahead / 3.0, 5.0, "they lead a moving ship, so holding course still gets us hit")
+
+
+func test_hitting_them_while_they_aim_spoils_the_broadside() -> void:
+	var enemy := _pirates_alongside()
+	await wait_physics_frames(2)
+	assert_true(enemy.aiming)
+	watch_signals(enemy)
+	enemy.take_hit(enemy.global_position)
+	assert_false(enemy.aiming, "knocked off their aim")
+	assert_signal_emitted(enemy, "spoiled")
+	assert_false(enemy.get_node("BroadsideWarning").showing(), "the rings vanish")
+	assert_gt(enemy.reload_left, 0.0, "they have to reload")
+	await wait_seconds(enemy.warning_seconds + 0.2)
+	assert_signal_not_emitted(enemy, "broadside", "no shot this time")
+
+
+func test_a_sinking_ship_takes_its_rings_with_it() -> void:
+	var enemy := _pirates_alongside()
+	await wait_physics_frames(2)
+	for i in enemy.health:
+		enemy.take_hit(enemy.global_position)
+	assert_false(enemy.get_node("BroadsideWarning").showing())
