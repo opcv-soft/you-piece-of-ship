@@ -1,7 +1,7 @@
 extends SceneTree
 ## Takes screenshots of a voyage for checking the look (not part of the game).
 ## godot --path . -s tools/screenshot.gd -- out=/path/shot.png wait=4 events=overheat,leak dev=1 contract=1
-## Several shots: shots=3 every=2 (out gets _1, _2... before the extension).
+## Several shots: shots=3 every=2 (out gets _1, _2... before the extension). haul=siren:3 fills the stores.
 
 func _initialize() -> void:
 	create_timer(50.0).timeout.connect(quit) # never hang
@@ -36,6 +36,8 @@ func _run() -> void:
 	await create_timer(float(args.get("wait", "3"))).timeout
 	for event in String(args.get("events", "")).split(",", false) if level.has_method("dev_event") else []:
 		level.dev_event(event)
+	for pair in String(args.get("haul", "")).split(",", false): # e.g. haul=siren:3,gold:5
+		level.get_node("Ship/ShipStores").add(pair.get_slice(":", 0), int(pair.get_slice(":", 1)))
 	if args.has("dev"):
 		level.get_node("PauseMenu").open_dev()
 	if args.has("pause"):

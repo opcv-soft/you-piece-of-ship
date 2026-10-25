@@ -12,11 +12,13 @@ const KINDS := ["gold", "coal", "planks", "grease", "siren"]
 const POINTS := {"gold": 40, "coal": 15, "planks": 20, "grease": 60, "siren": 150}
 const BUCKET := Vector3(8.4, 0.0, -0.9) ## the gold bucket, on the foredeck
 const GREASE := Vector3(-8.0, 0.0, -2.6) ## grease barrels, in the stern corner
-const SKEWER_TIP := Vector3(1.0, 2.6, 0.0) ## the first siren on the mast, above the crew's heads
-const SKEWER_STEP := Vector3(0.0, 0.8, 0.0) ## each new siren goes a little further up the mast
-const SKEWER_ROOM := 5 ## sirens that fit below the crow's nest; more start a new turn of the spiral
+const SKEWER_TIP := Vector3(1.0, 2.9, 0.0) ## the first siren's middle on the mast, her tail above the crew's heads
+const SKEWER_STEP := Vector3(0.0, 1.4, 0.0) ## each new siren goes further up the mast
+const SKEWER_ROOM := 3 ## sirens that fit below the crow's nest; more go round the mast at the same heights
+const CURL := 0.75 ## a skewered siren's curl: a C this radius, bulging toward the stern, head and tail fin on the mast
 
 var counts := {"gold": 0, "coal": 0, "planks": 0, "grease": 0, "siren": 0}
+static var _over_sail_cache := {}
 var _gold_heap: MeshInstance3D
 var _grease_barrels: Array[Node3D] = []
 
@@ -30,7 +32,7 @@ func _ready() -> void:
 func add(resource: String, amount := 1) -> int:
 	if not counts.has(resource) or amount <= 0:
 		return 0
-	counts[resource] += amount
+	counts[resource] += amount if resource != "siren" else 0
 	var ship := get_parent()
 	match resource:
 		"gold":
@@ -47,7 +49,9 @@ func add(resource: String, amount := 1) -> int:
 			for i in amount:
 				_add_grease_barrel()
 		"siren":
-			_skewer_siren()
+			for i in amount:
+				counts.siren += 1
+				_skewer_siren()
 	stored.emit(resource, amount)
 	return POINTS.get(resource, 0) * amount
 
@@ -105,34 +109,73 @@ func _add_grease_barrel() -> void:
 	_grease_barrels.append(barrel)
 
 
-## A little siren, skewered on the mast like a shrimp (Olivier, 2026-10-25): curled into a C, the
-## mast running through her head and her tail. Each one turns a bit further round the mast.
+## A siren skewered on the mast like a shrimp (Olivier, 2026-10-25: "skewered like a SHRIMP"): big,
+## curled into a C bulging toward the stern (clear of the sail), the mast through her head and her
+## tail fin, her tail banded like a shrimp's shell, eyes crossed out. They stack up the mast.
 func _skewer_siren() -> void:
 	var n: int = counts.siren - 1
 	var siren := Node3D.new()
 	siren.name = "Siren%d" % counts.siren
 	siren.position = SKEWER_TIP + SKEWER_STEP * (n % SKEWER_ROOM)
-	siren.rotation.y = n * 2.2 + (n / SKEWER_ROOM) * 0.6
-	# The C: an arc bulging out from the mast, both ends on it. [material, angle on the arc, size]
-	var parts := [["hair", 118.0, 0.24], ["skin", 105.0, 0.22], ["skin", 72.0, 0.2], ["skin", 38.0, 0.19],
-			["tail", 2.0, 0.17], ["tail", -35.0, 0.15], ["tail", -70.0, 0.13], ["tail", -100.0, 0.11]]
-	for part in parts:
-		var a := deg_to_rad(part[1])
-		siren.add_child(_blob(part[0], Vector3(0.2 + cos(a) * 0.45, sin(a) * 0.45, 0.0), Vector3.ONE * part[2]))
-	var a_fin := deg_to_rad(-118.0)
-	siren.add_child(_blob("tail", Vector3(0.2 + cos(a_fin) * 0.45, sin(a_fin) * 0.45, 0.0), Vector3(0.12, 0.08, 0.3))) # the fin
+	siren.rotation.y = [0.0, PI / 2.0, -PI / 2.0, PI][(n / SKEWER_ROOM) % 4] # a full mast: round the other sides
+	# Head, then torso, then a tail getting thinner, round the C. [material, degrees on the arc, size]
+	var segments := [["skin", 112.0, 0.4], ["skin", 88.0, 0.3], ["skin", 68.0, 0.36], ["skin", 48.0, 0.34],
+			["tail", 26.0, 0.32], ["tail_band", 6.0, 0.3], ["tail", -14.0, 0.28], ["tail_band", -34.0, 0.26],
+			["tail", -54.0, 0.24], ["tail_band", -74.0, 0.21], ["tail", -94.0, 0.18]]
+	for segment in segments:
+		var material: String = segment[0]
+		var mat := Toon.material("tail", Color(0.2, 0.62, 0.58)) if material == "tail_band" else Toon.material(material)
+		siren.add_child(_blob(mat, _on_curl(segment[1]), Vector3.ONE * float(segment[2])))
+	var head := _on_curl(112.0)
+	siren.add_child(_blob(Toon.material("hair"), head + Vector3(-0.22, 0.12, 0.0), Vector3(0.36, 0.42, 0.44))) # hair
+	siren.add_child(_blob(Toon.material("hair"), head + Vector3(-0.45, -0.3, 0.0), Vector3(0.16, 0.42, 0.3))) # hanging locks
+	for z in [-1.0, 1.0]: # face on both sides: crossed-out eyes and a blush
+		for eye_x in [0.12, -0.08]:
+			for tilt in [0.8, -0.8]:
+				var stroke := _blob(Toon.material("eye"), head + Vector3(eye_x, 0.06, z * 0.37), Vector3(0.025, 0.1, 0.025))
+				stroke.rotation.z = tilt
+				siren.add_child(stroke)
+		siren.add_child(_blob(Toon.material("blush"), head + Vector3(0.02, -0.12, z * 0.34), Vector3(0.08, 0.05, 0.04)))
+		siren.add_child(_blob(Toon.material("skin"), _on_curl(70.0) + Vector3(-0.15, -0.05, z * 0.36), Vector3(0.1, 0.24, 0.1))) # arms
+	var fin := _on_curl(-112.0)
+	for spread in [-0.5, 0.5]: # the tail fin, fanned out on the mast like a shrimp's tail
+		var lobe := _blob(Toon.material("tail"), fin + Vector3(0.0, -0.12, spread * 0.4), Vector3(0.1, 0.3, 0.28))
+		lobe.rotation.x = spread
+		siren.add_child(lobe)
+	for blob in siren.get_children():
+		blob.material_override = _over_sail(blob.material_override)
 	add_child(siren)
 	siren.scale = Vector3.ZERO
-	siren.create_tween().tween_property(siren, "scale", Vector3.ONE * 1.3, 0.4).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	var pop := siren.create_tween()
+	pop.tween_property(siren, "scale", Vector3.ONE, 0.4).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	pop.tween_property(siren, "rotation:z", 0.12, 0.15) # a last wiggle on the skewer
+	pop.tween_property(siren, "rotation:z", 0.0, 0.3).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
 
 
-func _blob(material: String, at: Vector3, size: Vector3) -> MeshInstance3D:
+## The sail hangs in front of the mast from the camera and washed the sirens out (Olivier,
+## 2026-10-25: "still does not work"): draw them after the sail and the see-through rigging.
+static func _over_sail(source: Material) -> Material:
+	var key := source.get_instance_id()
+	if not _over_sail_cache.has(key):
+		var mat := Toon.see_through(source, 1.0).duplicate() as Material
+		mat.render_priority = 5
+		_over_sail_cache[key] = mat
+	return _over_sail_cache[key]
+
+
+## A point on a skewered siren's curl, `degrees` round it (90 = the top end, on the mast).
+static func _on_curl(degrees: float) -> Vector3:
+	var a := deg_to_rad(degrees)
+	return Vector3(CURL * (cos(deg_to_rad(112.0)) - cos(a)), CURL * sin(a), 0.0)
+
+
+func _blob(material: Material, at: Vector3, size: Vector3) -> MeshInstance3D:
 	var ball := MeshInstance3D.new()
 	var sphere := SphereMesh.new()
 	sphere.radius = 1.0
 	sphere.height = 2.0
 	ball.mesh = sphere
-	ball.material_override = Toon.material(material)
+	ball.material_override = material
 	ball.position = at
 	ball.scale = size
 	return ball

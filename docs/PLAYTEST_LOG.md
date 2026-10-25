@@ -198,6 +198,7 @@ Decision: KEPT / REVERTED — why
 ## 2026-10-25 — Sirens on the mast + easier fishing (hypothesis/p2-siren-mast-fishing), awaiting playtest
 Olivier: "when i hit a siren, I want her skewered onto the mast, like a shrimp!" and "Increase fishing success by 1.5x and the duration through which the fish is fishable by 3x".
 Try: smash a siren (Esc → Developer to spawn one) and look up the mast; fish at the rail and see if strikes feel fair now.
-Observed:
-Biggest weakness:
-Decision: KEPT / REVERTED — why
+Observed (Olivier): fishing is OK now. The siren "still does not work": the skewered sirens were tiny blobs behind the see-through sail, nobody could tell what they were.
+Biggest weakness: the skewered siren is unreadable.
+Change: a big siren curled into a C, the mast through her head and tail, banded shrimp-shell tail, crossed-out eyes, drawn over the sail; checked in screenshots (tools/screenshot.gd haul=siren:3).
+Decision: fishing KEPT; siren awaiting a second look
