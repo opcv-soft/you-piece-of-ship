@@ -40,35 +40,37 @@ func test_charcoal_rocks_feed_the_furnace_and_planks_fill_the_box() -> void:
 	var engine := _ship.get_node("EngineSystem")
 	engine.fuel = 0.2
 	var rock: Node3D = _level._spawn_ahead("rock")
-	for i in 3:
-		rock.take_hit()
+	rock.take_hit()
 	await _collect_all()
 	assert_gt(engine.fuel, 0.3, "charcoal went into the firebox")
 	var planks: int = _ship.get_node("PlankBox").stock
 	var wreck: Node3D = _level._spawn_ahead("wreck")
-	for i in 4:
-		wreck.take_hit()
+	wreck.take_hit()
 	await _collect_all()
 	assert_gt(_ship.get_node("PlankBox").stock, planks, "planks for repairs")
 
 
-func test_the_siren_ends_up_skewered_on_the_mast_and_whales_give_grease() -> void:
+func test_one_cannonball_skewers_the_siren_on_the_bowsprit() -> void:
 	var siren: Node3D = _level._spawn_ahead("siren")
-	for i in 3:
-		siren.take_hit()
+	await wait_physics_frames(1)
+	var ball := Projectile.new()
+	_level.add_child(ball)
+	ball.shooter = _ship
+	ball.launch(_ship.global_position + Vector3(0, 1, 0), siren.global_position, 0.5)
+	await wait_seconds(0.8)
+	assert_false(siren.is_in_group("rocks"), "one shot breaks her")
 	await _collect_all()
 	assert_eq(_stores.counts.siren, 1)
 	var skewered: Node3D = _stores.get_node_or_null("Siren1")
-	assert_not_null(skewered, "skewered on the mast")
-	var mast: Vector3 = _ship.get_node("MastMesh").position
-	assert_almost_eq(skewered.position.x, mast.x, 0.01, "on the mast, not the bowsprit")
-	assert_almost_eq(skewered.position.z, mast.z, 0.01)
-	assert_gt(skewered.position.y, 2.0, "above the crew's heads")
+	assert_not_null(skewered, "skewered like a shrimp")
+	assert_gt(skewered.position.x, 14.6, "out on the bowsprit, past the bow")
+
+
+func test_whales_give_all_their_grease_in_one_shot() -> void:
 	var whale: Node3D = _level._spawn_ahead("whale")
-	for i in 5:
-		whale.take_hit()
+	assert_true(whale.take_hit(), "one shot")
 	await _collect_all()
-	assert_eq(_stores.counts.grease, 5, "a keg knocked off with every hit, and one when it breaks")
+	assert_eq(_stores.counts.grease, 5, "as much grease as the old five hits gave")
 
 
 func test_debris_floats_then_swooshes_into_its_pile_by_itself() -> void:
@@ -80,7 +82,7 @@ func test_debris_floats_then_swooshes_into_its_pile_by_itself() -> void:
 	assert_eq(get_tree().get_nodes_in_group("salvage").size(), 0)
 
 
-func test_every_cannonball_hit_knocks_charcoal_aboard() -> void:
+func test_one_cannonball_breaks_a_rock_and_knocks_charcoal_aboard() -> void:
 	var rock: Node3D = _level._spawn_ahead("rock")
 	await wait_physics_frames(1)
 	var ball := Projectile.new()
@@ -88,7 +90,7 @@ func test_every_cannonball_hit_knocks_charcoal_aboard() -> void:
 	ball.shooter = _ship
 	ball.launch(_ship.global_position + Vector3(0, 1, 0), rock.global_position, 0.5)
 	await wait_seconds(0.8)
-	assert_true(rock.is_in_group("rocks"), "one hit doesn't break it")
+	assert_false(rock.is_in_group("rocks"), "one shot breaks it")
 	await _collect_all()
 	assert_gt(_stores.counts.coal, 0, "but a lump of charcoal still comes aboard")
 
@@ -115,10 +117,9 @@ func test_at_the_beach_the_haul_goes_to_the_village() -> void:
 	assert_eq(_level.get_node("HUD/Results").outcome.haul.gold, 3)
 
 
-func test_sirens_stack_up_the_mast_below_the_crows_nest() -> void:
-	for i in 3:
-		_stores.add("siren")
+func test_sirens_thread_along_the_bowsprit() -> void:
+	_stores.add("siren", 3)
 	var first: Node3D = _stores.get_node("Siren1")
 	var third: Node3D = _stores.get_node("Siren3")
-	assert_gt(third.position.y, first.position.y, "each new siren goes further up")
-	assert_lt(third.position.y, 7.0, "below the crow's nest")
+	assert_lt(third.position.x, first.position.x, "each new siren goes further in along the pole")
+	assert_gt(third.position.x, 14.6, "all three out over the water")

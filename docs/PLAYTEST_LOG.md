@@ -201,4 +201,6 @@ Try: smash a siren (Esc → Developer to spawn one) and look up the mast; fish a
 Observed (Olivier): fishing is OK now. The siren "still does not work": the skewered sirens were tiny blobs behind the see-through sail, nobody could tell what they were.
 Biggest weakness: the skewered siren is unreadable.
 Change: a big siren curled into a C, the mast through her head and tail, banded shrimp-shell tail, crossed-out eyes, drawn over the sail; checked in screenshots (tools/screenshot.gd haul=siren:3).
-Decision: fishing KEPT; siren awaiting a second look
+Second look (Olivier): circled the bowsprit, "I want the siren here. And it still doesnt work. I shot the siren and I have no shrimp. All the stuff needs to be 100% breakable in one shot." (She took 3 hits, so one shot gave no siren.)
+Change: everything breakable breaks in one shot (same total loot); sirens threaded on the bowsprit, hanging under it like shrimp on a kebab stick; a test fires a real cannonball at a siren.
+Decision: fishing KEPT; siren + one-shot awaiting playtest

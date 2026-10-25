@@ -2,7 +2,7 @@ extends Node3D
 ## What the crew hauls home (Olivier, 2026-10-24): gold from barrels and treasure piles up in a
 ## bucket at the bow; charcoal from black rocks goes into the furnace; planks from wrecks and sunk
 ## pirates go into the plank box; whale grease in barrels; and every siren ends up skewered on the
-## mast, curled up like a shrimp (2026-10-25). A child of the ship. At the beach the haul flies to the village (voyage_arrival.gd).
+## bowsprit, curled up like a shrimp (2026-10-25). A child of the ship. At the beach the haul flies to the village (voyage_arrival.gd).
 
 signal stored(resource: String, amount: int)
 
@@ -12,10 +12,14 @@ const KINDS := ["gold", "coal", "planks", "grease", "siren"]
 const POINTS := {"gold": 40, "coal": 15, "planks": 20, "grease": 60, "siren": 150}
 const BUCKET := Vector3(8.4, 0.0, -0.9) ## the gold bucket, on the foredeck
 const GREASE := Vector3(-8.0, 0.0, -2.6) ## grease barrels, in the stern corner
-const SKEWER_TIP := Vector3(1.0, 2.9, 0.0) ## the first siren's middle on the mast, her tail above the crew's heads
-const SKEWER_STEP := Vector3(0.0, 1.4, 0.0) ## each new siren goes further up the mast
-const SKEWER_ROOM := 3 ## sirens that fit below the crow's nest; more go round the mast at the same heights
-const CURL := 0.75 ## a skewered siren's curl: a C this radius, bulging toward the stern, head and tail fin on the mast
+## Sirens on the bowsprit (Olivier, 2026-10-25, circled it: "I want the siren here"), threaded on it
+## like shrimp on a kebab stick. The pole rises POLE_ANGLE toward the bow (tools/blender/build_ship.py).
+const POLE_ANGLE := 0.272
+const SKEWER_TIP := Vector3(17.4, 2.72, 0.0) ## the first siren, near the bowsprit's end
+const SKEWER_STEP := Vector3(-1.15, -0.32, 0.0) ## the next one, further in along the pole
+const SKEWER_ROOM := 3 ## sirens that fit hanging under the pole; more sit curled on top of it
+const SKEWERED_SIZE := 0.85
+const CURL := 0.75 ## a skewered siren's curl: a C this radius, both ends (head and tail fin) on the pole
 
 var counts := {"gold": 0, "coal": 0, "planks": 0, "grease": 0, "siren": 0}
 static var _over_sail_cache := {}
@@ -109,15 +113,17 @@ func _add_grease_barrel() -> void:
 	_grease_barrels.append(barrel)
 
 
-## A siren skewered on the mast like a shrimp (Olivier, 2026-10-25: "skewered like a SHRIMP"): big,
-## curled into a C bulging toward the stern (clear of the sail), the mast through her head and her
-## tail fin, her tail banded like a shrimp's shell, eyes crossed out. They stack up the mast.
+## A siren skewered on the bowsprit like a shrimp (Olivier, 2026-10-25: "skewered like a SHRIMP"):
+## curled into a C hanging under the pole, the pole through her head and her tail fin, her tail banded
+## like a shrimp's shell, eyes crossed out. Built with the pole along her local y; turned onto it.
 func _skewer_siren() -> void:
 	var n: int = counts.siren - 1
 	var siren := Node3D.new()
 	siren.name = "Siren%d" % counts.siren
 	siren.position = SKEWER_TIP + SKEWER_STEP * (n % SKEWER_ROOM)
-	siren.rotation.y = [0.0, PI / 2.0, -PI / 2.0, PI][(n / SKEWER_ROOM) % 4] # a full mast: round the other sides
+	var on_pole := Basis(Vector3.BACK, PI / 2.0 + POLE_ANGLE) # her y along the pole, her C hanging down
+	var flip := Basis(SKEWER_STEP.normalized(), PI * ((n / SKEWER_ROOM) % 2)) # a full row: the next curl on top
+	siren.basis = flip * on_pole
 	# Head, then torso, then a tail getting thinner, round the C. [material, degrees on the arc, size]
 	var segments := [["skin", 112.0, 0.4], ["skin", 88.0, 0.3], ["skin", 68.0, 0.36], ["skin", 48.0, 0.34],
 			["tail", 26.0, 0.32], ["tail_band", 6.0, 0.3], ["tail", -14.0, 0.28], ["tail_band", -34.0, 0.26],
@@ -138,22 +144,20 @@ func _skewer_siren() -> void:
 		siren.add_child(_blob(Toon.material("blush"), head + Vector3(0.02, -0.12, z * 0.34), Vector3(0.08, 0.05, 0.04)))
 		siren.add_child(_blob(Toon.material("skin"), _on_curl(70.0) + Vector3(-0.15, -0.05, z * 0.36), Vector3(0.1, 0.24, 0.1))) # arms
 	var fin := _on_curl(-112.0)
-	for spread in [-0.5, 0.5]: # the tail fin, fanned out on the mast like a shrimp's tail
+	for spread in [-0.5, 0.5]: # the tail fin, fanned out on the pole like a shrimp's tail
 		var lobe := _blob(Toon.material("tail"), fin + Vector3(0.0, -0.12, spread * 0.4), Vector3(0.1, 0.3, 0.28))
 		lobe.rotation.x = spread
 		siren.add_child(lobe)
 	for blob in siren.get_children():
 		blob.material_override = _over_sail(blob.material_override)
 	add_child(siren)
-	siren.scale = Vector3.ZERO
+	siren.scale = Vector3.ONE * 0.01 # (not zero: that would lose her turn onto the pole)
 	var pop := siren.create_tween()
-	pop.tween_property(siren, "scale", Vector3.ONE, 0.4).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	pop.tween_property(siren, "rotation:z", 0.12, 0.15) # a last wiggle on the skewer
-	pop.tween_property(siren, "rotation:z", 0.0, 0.3).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+	pop.tween_property(siren, "scale", Vector3.ONE * SKEWERED_SIZE, 0.4).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
-## The sail hangs in front of the mast from the camera and washed the sirens out (Olivier,
-## 2026-10-25: "still does not work"): draw them after the sail and the see-through rigging.
+## The see-through sails (the jib over the bowsprit) would wash the sirens out: draw them after the
+## sails and the rigging.
 static func _over_sail(source: Material) -> Material:
 	var key := source.get_instance_id()
 	if not _over_sail_cache.has(key):
@@ -163,7 +167,7 @@ static func _over_sail(source: Material) -> Material:
 	return _over_sail_cache[key]
 
 
-## A point on a skewered siren's curl, `degrees` round it (90 = the top end, on the mast).
+## A point on a skewered siren's curl, `degrees` round it (90 = the top end, on the pole).
 static func _on_curl(degrees: float) -> Vector3:
 	var a := deg_to_rad(degrees)
 	return Vector3(CURL * (cos(deg_to_rad(112.0)) - cos(a)), CURL * sin(a), 0.0)

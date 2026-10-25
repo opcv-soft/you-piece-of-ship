@@ -13,9 +13,13 @@ const Sfx = preload("res://scripts/systems/sfx.gd")
 const SOUNDS := {"rock": "rock_crack", "wreck": "wood_splinter", "barrel": "barrel_burst", "siren": "siren_shriek",
 		"whale": "whale_moan"}
 ## kind -> [health, loot pieces, resource, units each]. Rocks are black charcoal rocks; the siren
-## goes straight onto the bowsprit; whales give grease (Olivier, 2026-10-24).
-const KINDS := {"rock": [3, 1, "coal", 2], "wreck": [4, 2, "planks", 2], "siren": [3, 0, "siren", 1],
-		"barrel": [1, 1, "gold", 3], "whale": [5, 1, "grease", 1]}
+## goes straight onto the bowsprit; whales give grease (Olivier, 2026-10-24). Health is what rams
+## need (rocks stay obstacles for the helm); a cannonball does ONE_SHOT and breaks anything (Olivier,
+## 2026-10-25: "All the stuff needs to be 100% breakable in one shot"), for all the loot the old
+## hits together used to give.
+const KINDS := {"rock": [3, 1, "coal", 4], "wreck": [4, 1, "planks", 7], "siren": [3, 0, "siren", 1],
+		"barrel": [1, 1, "gold", 3], "whale": [5, 1, "grease", 5]}
+const ONE_SHOT := 99 ## a cannonball's damage
 
 var health := 1
 var _obstacle: Node3D

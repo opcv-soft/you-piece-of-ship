@@ -128,8 +128,9 @@ func avoid_radius() -> float:
 	return radius + swim_amplitude * 0.75 if kind == "whale" else radius
 
 
-## A cannonball or a ram. Returns true if it broke (whales, cliffs and atolls never do).
-func take_hit(_point := Vector3.ZERO, damage := 1) -> bool:
+## A cannonball (breaks it in one shot) or a ram (damage by how hard). Returns true if it broke
+## (cliffs and atolls never do).
+func take_hit(_point := Vector3.ZERO, damage := Breakable.ONE_SHOT) -> bool:
 	var breakable := get_node_or_null("Breakable")
 	return breakable.hit(damage) if breakable else false
 
