@@ -2,7 +2,7 @@ extends Node3D
 ## What the crew hauls home (Olivier, 2026-10-24): gold from barrels and treasure piles up in a
 ## bucket at the bow; charcoal from black rocks goes into the furnace; planks from wrecks and sunk
 ## pirates go into the plank box; whale grease in barrels; and every siren ends up skewered on the
-## bowsprit. A child of the ship. At the beach the haul flies to the village (voyage_arrival.gd).
+## mast, curled up like a shrimp (2026-10-25). A child of the ship. At the beach the haul flies to the village (voyage_arrival.gd).
 
 signal stored(resource: String, amount: int)
 
@@ -12,8 +12,9 @@ const KINDS := ["gold", "coal", "planks", "grease", "siren"]
 const POINTS := {"gold": 40, "coal": 15, "planks": 20, "grease": 60, "siren": 150}
 const BUCKET := Vector3(8.4, 0.0, -0.9) ## the gold bucket, on the foredeck
 const GREASE := Vector3(-8.0, 0.0, -2.6) ## grease barrels, in the stern corner
-const SKEWER_TIP := Vector3(17.6, 2.75, 0.0) ## the bowsprit's end
-const SKEWER_STEP := Vector3(-1.0, -0.18, 0.0) ## each new siren goes a little further up the pole
+const SKEWER_TIP := Vector3(1.0, 2.6, 0.0) ## the first siren on the mast, above the crew's heads
+const SKEWER_STEP := Vector3(0.0, 0.8, 0.0) ## each new siren goes a little further up the mast
+const SKEWER_ROOM := 5 ## sirens that fit below the crow's nest; more start a new turn of the spiral
 
 var counts := {"gold": 0, "coal": 0, "planks": 0, "grease": 0, "siren": 0}
 var _gold_heap: MeshInstance3D
@@ -104,25 +105,34 @@ func _add_grease_barrel() -> void:
 	_grease_barrels.append(barrel)
 
 
-## A little siren, skewered on the bowsprit like a trophy.
+## A little siren, skewered on the mast like a shrimp (Olivier, 2026-10-25): curled into a C, the
+## mast running through her head and her tail. Each one turns a bit further round the mast.
 func _skewer_siren() -> void:
+	var n: int = counts.siren - 1
 	var siren := Node3D.new()
 	siren.name = "Siren%d" % counts.siren
-	siren.position = SKEWER_TIP + SKEWER_STEP * (counts.siren - 1)
-	siren.rotation.z = -0.4
-	var parts := [["skin", Vector3(0, 0.0, 0), Vector3(0.28, 0.4, 0.24)], ["skin", Vector3(0, 0.55, 0), Vector3(0.3, 0.3, 0.3)],
-			["hair", Vector3(-0.08, 0.62, 0), Vector3(0.34, 0.34, 0.34)], ["tail", Vector3(0, -0.5, 0), Vector3(0.22, 0.45, 0.2)],
-			["tail", Vector3(0.1, -0.95, 0), Vector3(0.35, 0.12, 0.3)]]
+	siren.position = SKEWER_TIP + SKEWER_STEP * (n % SKEWER_ROOM)
+	siren.rotation.y = n * 2.2 + (n / SKEWER_ROOM) * 0.6
+	# The C: an arc bulging out from the mast, both ends on it. [material, angle on the arc, size]
+	var parts := [["hair", 118.0, 0.24], ["skin", 105.0, 0.22], ["skin", 72.0, 0.2], ["skin", 38.0, 0.19],
+			["tail", 2.0, 0.17], ["tail", -35.0, 0.15], ["tail", -70.0, 0.13], ["tail", -100.0, 0.11]]
 	for part in parts:
-		var ball := MeshInstance3D.new()
-		var sphere := SphereMesh.new()
-		sphere.radius = 1.0
-		sphere.height = 2.0
-		ball.mesh = sphere
-		ball.material_override = Toon.material(part[0])
-		ball.position = part[1]
-		ball.scale = part[2]
-		siren.add_child(ball)
+		var a := deg_to_rad(part[1])
+		siren.add_child(_blob(part[0], Vector3(0.2 + cos(a) * 0.45, sin(a) * 0.45, 0.0), Vector3.ONE * part[2]))
+	var a_fin := deg_to_rad(-118.0)
+	siren.add_child(_blob("tail", Vector3(0.2 + cos(a_fin) * 0.45, sin(a_fin) * 0.45, 0.0), Vector3(0.12, 0.08, 0.3))) # the fin
 	add_child(siren)
 	siren.scale = Vector3.ZERO
-	siren.create_tween().tween_property(siren, "scale", Vector3.ONE, 0.4).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	siren.create_tween().tween_property(siren, "scale", Vector3.ONE * 1.3, 0.4).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+
+func _blob(material: String, at: Vector3, size: Vector3) -> MeshInstance3D:
+	var ball := MeshInstance3D.new()
+	var sphere := SphereMesh.new()
+	sphere.radius = 1.0
+	sphere.height = 2.0
+	ball.mesh = sphere
+	ball.material_override = Toon.material(material)
+	ball.position = at
+	ball.scale = size
+	return ball

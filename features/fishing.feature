@@ -12,3 +12,8 @@ Feature: Fishing
     Then it goes fishing
     When a leak opens
     Then it reels in and goes to fix it
+
+  Scenario: Fish are easy to catch
+    Given a crew member at a fishing spot with the line cast
+    Then three tugs in four are real bites (the rest are nibbles)
+    And after a bite they have 1.35 to 2.4 seconds to press Jump

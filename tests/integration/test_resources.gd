@@ -52,13 +52,18 @@ func test_charcoal_rocks_feed_the_furnace_and_planks_fill_the_box() -> void:
 	assert_gt(_ship.get_node("PlankBox").stock, planks, "planks for repairs")
 
 
-func test_the_siren_ends_up_on_the_bowsprit_and_whales_give_grease() -> void:
+func test_the_siren_ends_up_skewered_on_the_mast_and_whales_give_grease() -> void:
 	var siren: Node3D = _level._spawn_ahead("siren")
 	for i in 3:
 		siren.take_hit()
 	await _collect_all()
 	assert_eq(_stores.counts.siren, 1)
-	assert_not_null(_stores.get_node_or_null("Siren1"), "skewered on the bowsprit")
+	var skewered: Node3D = _stores.get_node_or_null("Siren1")
+	assert_not_null(skewered, "skewered on the mast")
+	var mast: Vector3 = _ship.get_node("MastMesh").position
+	assert_almost_eq(skewered.position.x, mast.x, 0.01, "on the mast, not the bowsprit")
+	assert_almost_eq(skewered.position.z, mast.z, 0.01)
+	assert_gt(skewered.position.y, 2.0, "above the crew's heads")
 	var whale: Node3D = _level._spawn_ahead("whale")
 	for i in 5:
 		whale.take_hit()
@@ -108,3 +113,12 @@ func test_at_the_beach_the_haul_goes_to_the_village() -> void:
 	assert_true(_level.finished)
 	assert_eq(Session.village.gold, gold_before + 3, "the gold is in the village stockpile")
 	assert_eq(_level.get_node("HUD/Results").outcome.haul.gold, 3)
+
+
+func test_sirens_stack_up_the_mast_below_the_crows_nest() -> void:
+	for i in 3:
+		_stores.add("siren")
+	var first: Node3D = _stores.get_node("Siren1")
+	var third: Node3D = _stores.get_node("Siren3")
+	assert_gt(third.position.y, first.position.y, "each new siren goes further up")
+	assert_lt(third.position.y, 7.0, "below the crow's nest")

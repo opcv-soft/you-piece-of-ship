@@ -87,3 +87,20 @@ func test_the_catch_is_reeled_onto_the_deck_and_stays_there() -> void:
 	assert_eq(fish.size(), 1, "the fish is on the deck")
 	assert_true(_ship.is_ancestor_of(fish[0]))
 	assert_eq(spot.phase, spot.Phase.WAITING, "and the line is cast again")
+
+
+func test_fishing_is_easier_three_in_four_tugs_bite_and_the_strike_window_is_three_times_longer() -> void:
+	var spot: Node3D = _ship.get_node("FishingSpot1")
+	assert_almost_eq(spot.nibble_chance, 0.25, 0.001, "1.5x the real bites (was one in two)")
+	assert_almost_eq(spot.bite_window_min, 1.35, 0.001, "3x the old 0.45 s")
+	assert_almost_eq(spot.bite_window_max, 2.4, 0.001, "3x the old 0.8 s")
+	var fisher: Node3D = _crew[1]
+	fisher.position = spot.position
+	await wait_physics_frames(2)
+	spot.occupy(fisher)
+	spot.nibble_chance = 0.0
+	spot.wait_left = 0.0
+	await wait_physics_frames(2)
+	assert_eq(spot.phase, spot.Phase.BITE)
+	await wait_seconds(1.0)
+	assert_eq(spot.phase, spot.Phase.BITE, "still on the hook a second later")

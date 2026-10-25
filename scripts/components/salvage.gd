@@ -3,7 +3,7 @@ extends Node3D
 ## disassemble, break into pieces. the debris should float and then get swooshed in the correct
 ## stock pile on the boat"). The pieces pop out, bob on the water a moment, then fly in arcs onto
 ## the ship, each into its own pile: charcoal to the coal pile, planks to the plank box, gold to the
-## bucket, grease to the grease barrels, a siren onto the bowsprit. When the last piece lands the
+## bucket, grease to the grease barrels, a siren onto the mast. When the last piece lands the
 ## haul goes into ShipStores and the score. Spawned by breakable.gd and enemy_ship.gd.
 
 const Toon = preload("res://scripts/systems/toon.gd")

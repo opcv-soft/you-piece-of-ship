@@ -24,9 +24,12 @@ const ItemScene = preload("res://scenes/greybox/item.tscn")
 # Olivier, 2026-10-24: "Reduce the frequency of fish success, increase randomness, add dev controls".
 @export_range(1.0, 30.0, 0.5) var bite_min := 6.0 ## seconds before something tugs, at least
 @export_range(1.0, 60.0, 0.5) var bite_max := 18.0
-@export_range(0.0, 0.9, 0.05) var nibble_chance := 0.5 ## a tug is just a nibble (strike = too early)
-@export_range(0.2, 2.0, 0.05) var bite_window_min := 0.45 ## seconds to strike on a real bite
-@export_range(0.2, 2.0, 0.05) var bite_window_max := 0.8
+## A tug is just a nibble (strike = too early). 0.25: three tugs in four are real bites (Olivier,
+## 2026-10-25: "increase fishing success by 1.5x", it was one in two).
+@export_range(0.0, 0.9, 0.05) var nibble_chance := 0.25
+## Seconds to strike on a real bite: 3x the old 0.45-0.8 s (Olivier, 2026-10-25).
+@export_range(0.2, 6.0, 0.05) var bite_window_min := 1.35
+@export_range(0.2, 6.0, 0.05) var bite_window_max := 2.4
 @export_range(0.0, 100.0, 1.0) var sardine_weight := 70.0
 @export_range(0.0, 100.0, 1.0) var goldfish_weight := 12.0
 @export_range(0.0, 100.0, 1.0) var squid_weight := 9.0
